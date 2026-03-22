@@ -3,7 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Mail, Phone, Building2 } from "lucide-react";
+import { useState } from "react";
+import { Mail, Phone, Building2, PanelLeftClose, PanelLeftOpen, LayoutDashboard, FileText, Users, Settings, LogOut, ChevronUp } from "lucide-react";
 
 import {
   Popover,
@@ -17,45 +18,171 @@ type LayoutShellProps = {
 
 export function LayoutShell({ children }: LayoutShellProps) {
   const pathname = usePathname();
-  const isDashboardRoute = pathname.startsWith("/dashboard");
+  const isDashboardRoute = pathname.startsWith("/dashboard") || pathname.startsWith("/payroll") || pathname.startsWith("/admin") || pathname.startsWith("/user");
+
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+
+  const navItems = [
+    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/payroll", label: "Documents", icon: FileText },
+    { href: "/admin/roles", label: "User Management", icon: Users },
+  ];
 
   if (isDashboardRoute) {
     return (
       <div className="flex min-h-screen bg-background text-foreground">
-        <aside className="flex w-64 flex-col border-r border-border bg-card/40">
-          <div className="flex h-14 items-center border-b border-border px-4">
-            <Link
-              href="/dashboard"
-              className="text-base font-semibold tracking-tight"
-            >
-              D-Track
-            </Link>
+        <aside
+          className="flex flex-col border-r border-border transition-all duration-300"
+          style={{
+            backgroundColor: "#3338A0",
+            width: sidebarOpen ? "16rem" : "3.5rem",
+            minWidth: sidebarOpen ? "16rem" : "3.5rem",
+          }}
+        >
+          {/* Header */}
+          <div
+            className="flex h-14 items-center border-b px-3"
+            style={{ borderColor: "rgba(255,255,255,0.15)" }}
+          >
+            {sidebarOpen ? (
+              <>
+                <Link
+                  href="/dashboard"
+                  className="flex flex-1 items-center gap-2 text-base font-semibold tracking-tight text-white whitespace-nowrap overflow-hidden"
+                >
+                  <Image src="/img/logo.png" alt="D-Track Logo" width={28} height={28} className="shrink-0" />
+                  <span>D-Track</span>
+                </Link>
+                <div className="relative ml-1 shrink-0 group/tooltip">
+                  <button
+                    onClick={() => setSidebarOpen(false)}
+                    className="rounded-md p-1.5 text-white/70 transition-colors hover:bg-white/20 hover:text-white"
+                    aria-label="Collapse sidebar"
+                  >
+                    <PanelLeftClose className="h-4 w-4" />
+                  </button>
+                  <span className="pointer-events-none absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs text-white opacity-0 transition-opacity duration-150 group-hover/tooltip:opacity-100 z-50">
+                    Collapse sidebar
+                  </span>
+                </div>
+              </>
+            ) : (
+              <div className="relative mx-auto group/tooltip">
+                <button
+                  onClick={() => setSidebarOpen(true)}
+                  className="rounded-md p-1.5 text-white/70 transition-colors hover:bg-white/20 hover:text-white"
+                  aria-label="Expand sidebar"
+                >
+                  <PanelLeftOpen className="h-4 w-4" />
+                </button>
+                <span className="pointer-events-none absolute left-full top-1/2 ml-2 -translate-y-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs text-white opacity-0 transition-opacity duration-150 group-hover/tooltip:opacity-100 z-50">
+                  Expand sidebar
+                </span>
+              </div>
+            )}
           </div>
-          <nav className="grid gap-1 p-3">
-            <Link
-              href="/dashboard"
-              className="rounded-md px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
-            >
-              Dashboard
-            </Link>
-            <Link
-              href="/dashboard/documents"
-              className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
-            >
-              Documents
-            </Link>
-            <Link
-              href="/dashboard/user-management"
-              className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
-            >
-              User Management
-            </Link>
+
+          {/* Nav */}
+          <nav className="grid gap-1 p-2">
+            {navItems.map(({ href, label, icon: Icon }) => {
+              const isActive = pathname === href;
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  title={!sidebarOpen ? label : undefined}
+                  className={`flex items-center gap-3 rounded-md px-2.5 py-2 text-sm font-medium transition-colors hover:bg-white/20 hover:text-white ${
+                    isActive ? "bg-white/20 text-white" : "text-white/70"
+                  } ${!sidebarOpen ? "justify-center" : ""}`}
+                >
+                  <Icon className="h-4 w-4 shrink-0" />
+                  {sidebarOpen && <span className="whitespace-nowrap overflow-hidden">{label}</span>}
+                </Link>
+              );
+            })}
           </nav>
-          <div className="mt-auto border-t border-border p-4">
-            <p className="text-xs text-muted-foreground">Logged in as</p>
-            <p className="truncate text-sm font-medium">user@dpwh.gov.ph</p>
+
+          {/* Footer */}
+          <div
+            className="relative mt-auto border-t p-3"
+            style={{ borderColor: "rgba(255,255,255,0.15)" }}
+          >
+            {/* Dropdown Menu */}
+            {userMenuOpen && (
+              <div
+                className="absolute rounded-lg overflow-hidden shadow-xl z-50"
+                style={{
+                  backgroundColor: "#fff",
+                  border: "1px solid #E5E7EB",
+                  width: "200px",
+                  ...(sidebarOpen
+                    ? { bottom: "100%", left: "0.75rem", right: "0.75rem", width: "auto", marginBottom: "0.5rem" }
+                    : { bottom: "0", left: "calc(100% + 8px)" }),
+                }}
+              >
+                {/* User info header */}
+                <div className="px-3 py-2.5 border-b" style={{ borderColor: "#F3F4F6" }}>
+                  <p className="text-xs font-semibold truncate" style={{ color: "#111827" }}>Maria Santos</p>
+                  <p className="text-xs truncate" style={{ color: "#9CA3AF" }}>user@dpwh.gov.ph</p>
+                </div>
+                <div className="py-1">
+                  <Link
+                    href="/user/user-account"
+                    onClick={() => setUserMenuOpen(false)}
+                    className="flex items-center gap-2.5 px-3 py-2 text-sm transition-colors hover:bg-gray-50"
+                    style={{ color: "#374151" }}
+                  >
+                    <Settings className="h-4 w-4" style={{ color: "#6B7280" }} />
+                    Account Settings
+                  </Link>
+                  <Link
+                    href="/"
+                    onClick={() => setUserMenuOpen(false)}
+                    className="flex w-full items-center gap-2.5 px-3 py-2 text-sm transition-colors hover:bg-gray-50"
+                    style={{ color: "#DC2626" }}
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Log out
+                  </Link>
+                </div>
+              </div>
+            )}
+
+            {/* Trigger Button */}
+            {sidebarOpen ? (
+              <button
+                onClick={() => setUserMenuOpen((o) => !o)}
+                className="flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 transition-colors hover:bg-white/10"
+              >
+                <div
+                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
+                  style={{ backgroundColor: "rgba(255,255,255,0.2)" }}
+                >
+                  U
+                </div>
+                <div className="flex-1 min-w-0 text-left">
+                  <p className="text-xs whitespace-nowrap" style={{ color: "rgba(255,255,255,0.55)" }}>Logged in as</p>
+                  <p className="truncate text-sm font-medium text-white">user@dpwh.gov.ph</p>
+                </div>
+                <ChevronUp
+                  className="h-3.5 w-3.5 shrink-0 transition-transform duration-200"
+                  style={{ color: "rgba(255,255,255,0.5)", transform: userMenuOpen ? "rotate(180deg)" : "rotate(0deg)" }}
+                />
+              </button>
+            ) : (
+              <button
+                onClick={() => setUserMenuOpen((o) => !o)}
+                className="mx-auto flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold text-white transition-colors hover:bg-white/30"
+                style={{ backgroundColor: "rgba(255,255,255,0.2)" }}
+                title="user@dpwh.gov.ph"
+              >
+                U
+              </button>
+            )}
           </div>
         </aside>
+
         <div className="flex-1">{children}</div>
       </div>
     );
@@ -101,21 +228,21 @@ export function LayoutShell({ children }: LayoutShellProps) {
                       <Mail className="mt-0.5 h-3 w-3 shrink-0" style={{ color: "#3338A0" }} />
                       <div>
                         <p className="font-medium" style={{ color: "#1F2937" }}>Email</p>
-                        <p style={{ color: "#374151" }}>support@dtrack.gov.ph</p>
+                        <p style={{ color: "#374151" }}>john.doe@example.com</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-2 text-xs">
                       <Phone className="mt-0.5 h-3 w-3 shrink-0" style={{ color: "#3338A0" }} />
                       <div>
                         <p className="font-medium" style={{ color: "#1F2937" }}>Phone</p>
-                        <p style={{ color: "#374151" }}>+63 2 1234 5678</p>
+                        <p style={{ color: "#374151" }}>+XXXXXXXXXX</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-2 text-xs">
                       <Building2 className="mt-0.5 h-3 w-3 shrink-0" style={{ color: "#3338A0" }} />
                       <div>
                         <p className="font-medium" style={{ color: "#1F2937" }}>Office</p>
-                        <p style={{ color: "#374151" }}>DPWH Central Office</p>
+                        <p style={{ color: "#374151" }}>DPWH Regional Office XIII</p>
                       </div>
                     </div>
                   </div>

@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Home() {
   return (
     <main style={{ backgroundColor: "#F7F7F7" }}>
@@ -18,12 +20,13 @@ export default function Home() {
           Organize and monitor payroll documents with ease while reducing manual
           errors, and maintaining a secure and reliable system.
         </p>
-        <button
+        <Link
+          href="/login"
           className="relative mt-6 rounded-md px-6 py-2.5 text-sm font-semibold text-black transition-opacity hover:opacity-90"
           style={{ backgroundColor: "#FCC61D" }}
         >
           Get Started
-        </button>
+        </Link>
       </section>
 
       <section
@@ -59,8 +62,14 @@ export default function Home() {
             className="group relative rounded-xl p-6 text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
             style={{ backgroundColor: "#fff", border: "1px solid #e5e7eb", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}
           >
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full text-2xl" style={{ backgroundColor: "#FCC61D22" }}>
-              📄
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: "#FCC61D22" }}>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#3338A0" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="16" y1="13" x2="8" y2="13" />
+                <line x1="16" y1="17" x2="8" y2="17" />
+                <line x1="10" y1="9" x2="8" y2="9" />
+              </svg>
             </div>
             <h3 className="text-base font-semibold" style={{ color: "#3338A0" }}>Document Tracking</h3>
             <p className="mt-2 text-sm" style={{ color: "#374151" }}>
@@ -73,8 +82,15 @@ export default function Home() {
             className="group relative rounded-xl p-6 text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
             style={{ backgroundColor: "#fff", border: "1px solid #e5e7eb", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}
           >
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full text-2xl" style={{ backgroundColor: "#FCC61D22" }}>
-              📋
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: "#FCC61D22" }}>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#3338A0" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                <line x1="16" y1="2" x2="16" y2="6" />
+                <line x1="8" y1="2" x2="8" y2="6" />
+                <line x1="3" y1="10" x2="21" y2="10" />
+                <line x1="8" y1="14" x2="16" y2="14" />
+                <line x1="8" y1="18" x2="13" y2="18" />
+              </svg>
             </div>
             <h3 className="text-base font-semibold" style={{ color: "#3338A0" }}>Online Logbook</h3>
             <p className="mt-2 text-sm" style={{ color: "#374151" }}>
@@ -87,8 +103,12 @@ export default function Home() {
             className="group relative rounded-xl p-6 text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
             style={{ backgroundColor: "#fff", border: "1px solid #e5e7eb", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}
           >
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full text-2xl" style={{ backgroundColor: "#FCC61D22" }}>
-              🔔
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: "#FCC61D22" }}>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#3338A0" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                <line x1="12" y1="2" x2="12" y2="4" />
+              </svg>
             </div>
             <h3 className="text-base font-semibold" style={{ color: "#3338A0" }}>Status Alerts</h3>
             <p className="mt-2 text-sm" style={{ color: "#374151" }}>
