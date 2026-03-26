@@ -44,7 +44,7 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: () => void 
       role="switch"
       aria-checked={checked}
     >
-      <span
+      <span   
         className="inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform duration-200"
         style={{ transform: checked ? "translateX(18px)" : "translateX(2px)" }}
       />

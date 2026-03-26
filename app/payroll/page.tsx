@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import React from "react";
 import {
   FileText,
-  ClipboardList,
   CheckCircle2,
   Loader2,
   XCircle,
@@ -13,7 +12,6 @@ import {
 
 const tabs = [
   { id: "payroll", label: "Payroll", icon: FileText },
-  { id: "tracker", label: "Tracker", icon: ClipboardList },
 ];
 
 const payrollDocs = [
@@ -24,14 +22,6 @@ const payrollDocs = [
   { id: "PR-2026-010", title: "Overtime Pay – Feb 2026", division: "Operations", date: "Feb 20, 2026", status: "completed" },
 ];
 
-const trackerDocs = [
-  { id: "TRK-2026-009", title: "Infrastructure Budget Proposal Q1", division: "Planning", date: "Mar 10, 2026", status: "overdue" },
-  { id: "TRK-2026-008", title: "Leave of Absence – J. Santos", division: "HR Division", date: "Mar 20, 2026", status: "pending" },
-  { id: "TRK-2026-007", title: "Procurement Request – Office Supplies", division: "Admin", date: "Mar 17, 2026", status: "completed" },
-  { id: "TRK-2026-006", title: "Travel Order – R. Cruz", division: "Engineering", date: "Mar 12, 2026", status: "pending" },
-  { id: "TRK-2026-005", title: "Certificate of Employment – M. Reyes", division: "HR Division", date: "Mar 05, 2026", status: "completed" },
-];
-
 const statusStyle: Record<string, { label: string; icon: React.ReactNode; color: string; bg: string }> = {
   completed: { label: "Completed", icon: <CheckCircle2 className="h-3.5 w-3.5" />, color: "#16A34A", bg: "#F0FDF4" },
   pending:   { label: "Pending",   icon: <Loader2 className="h-3.5 w-3.5" />,       color: "#D97706", bg: "#FFFBEB" },
@@ -39,8 +29,7 @@ const statusStyle: Record<string, { label: string; icon: React.ReactNode; color:
 };
 
 export default function PayrollPage() {
-  const [activeTab, setActiveTab] = useState("payroll");
-  const docs = activeTab === "payroll" ? payrollDocs : trackerDocs;
+  const docs = payrollDocs;
 
   return (
     <main className="min-h-screen p-6 sm:p-8" style={{ backgroundColor: "#F7F7F7" }}>
@@ -55,21 +44,21 @@ export default function PayrollPage() {
         </p>
       </div>
 
-      {/* Tab Menu Bar */}
+      {/* Tab Menu Bar (Underline style like Users/Departments) */}
       <div
-        className="mb-6 flex items-center gap-1 rounded-xl p-1 w-fit"
-        style={{ backgroundColor: "#E8EAF6", border: "1px solid #C5CAE9" }}
+        className="mb-6 flex items-center gap-0 border-b"
+        style={{ borderColor: "#E5E7EB" }}
       >
         {tabs.map(({ id, label, icon: Icon }) => (
           <button
             key={id}
-            onClick={() => setActiveTab(id)}
-            className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-200"
-            style={
-              activeTab === id
-                ? { backgroundColor: "#3338A0", color: "#fff", boxShadow: "0 2px 8px rgba(51,56,160,0.25)" }
-                : { backgroundColor: "transparent", color: "#6B7280" }
-            }
+            className="flex items-center gap-2 px-5 py-3.5 text-sm font-semibold transition-all duration-200 relative"
+            style={{
+              color: "#3338A0",
+              borderBottom: "2px solid #3338A0",
+              marginBottom: "-1px",
+              background: "transparent",
+            }}
           >
             <Icon className="h-4 w-4" />
             {label}
@@ -79,7 +68,7 @@ export default function PayrollPage() {
 
       {/* Document Table */}
       <div
-        className="rounded-xl overflow-hidden mb-6"
+        className="rounded-xl overflow-hidden"
         style={{ backgroundColor: "#fff", border: "1px solid #E5E7EB", boxShadow: "0 1px 6px rgba(0,0,0,0.05)" }}
       >
         {/* Table Header */}
@@ -89,12 +78,10 @@ export default function PayrollPage() {
         >
           <div>
             <h2 className="text-base font-semibold" style={{ color: "#1E1E2E" }}>
-              {activeTab === "payroll" ? "Payroll Documents" : "Tracked Documents"}
+              Payroll Documents
             </h2>
             <p className="text-xs mt-0.5" style={{ color: "#9CA3AF" }}>
-              {activeTab === "payroll"
-                ? "All payroll-related document records"
-                : "Document movement across divisions"}
+              All payroll-related document records
             </p>
           </div>
           <span
@@ -107,13 +94,13 @@ export default function PayrollPage() {
 
         {/* Column Headers */}
         <div
-          className="grid grid-cols-[1fr_auto_auto_auto] gap-4 px-5 py-2.5 text-xs font-semibold uppercase tracking-wider"
-          style={{ backgroundColor: "#F9FAFB", color: "#9CA3AF", borderBottom: "1px solid #F3F4F6" }}
+          className="grid gap-4 px-5 py-2.5 text-xs font-semibold uppercase tracking-wider"
+          style={{ gridTemplateColumns: "1fr 2fr 1fr 1fr", backgroundColor: "#F9FAFB", color: "#9CA3AF", borderBottom: "1px solid #F3F4F6" }}
         >
           <span>Document</span>
-          <span className="text-right">Division</span>
-          <span className="text-right">Date</span>
-          <span className="text-right">Status</span>
+          <span>Division</span>
+          <span className="text-center">Date</span>
+          <span className="text-center">Status</span>
         </div>
 
         {/* Rows */}
@@ -122,21 +109,23 @@ export default function PayrollPage() {
           return (
             <div
               key={doc.id}
-              className="grid grid-cols-[1fr_auto_auto_auto] gap-4 items-center px-5 py-3.5 transition-colors hover:bg-gray-50 cursor-pointer"
-              style={{ borderBottom: i < docs.length - 1 ? "1px solid #F3F4F6" : "none" }}
+              className="grid gap-4 items-center px-5 py-3.5 transition-colors hover:bg-gray-50 cursor-pointer"
+              style={{ gridTemplateColumns: "1fr 2fr 1fr 1fr", borderBottom: i < docs.length - 1 ? "1px solid #F3F4F6" : "none" }}
             >
               <div className="min-w-0">
                 <p className="text-sm font-medium truncate" style={{ color: "#111827" }}>{doc.title}</p>
                 <p className="text-xs mt-0.5" style={{ color: "#9CA3AF" }}>{doc.id}</p>
               </div>
-              <span className="text-xs whitespace-nowrap" style={{ color: "#6B7280" }}>{doc.division}</span>
-              <span className="text-xs whitespace-nowrap" style={{ color: "#6B7280" }}>{doc.date}</span>
-              <div
-                className="flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap"
-                style={{ backgroundColor: s.bg, color: s.color }}
-              >
-                {s.icon}
-                {s.label}
+              <span className="text-xs" style={{ color: "#6B7280" }}>{doc.division}</span>
+              <span className="text-xs text-center" style={{ color: "#6B7280" }}>{doc.date}</span>
+              <div className="flex justify-center">
+                <div
+                  className="flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap"
+                  style={{ backgroundColor: s.bg, color: s.color }}
+                >
+                  {s.icon}
+                  {s.label}
+                </div>
               </div>
             </div>
           );
@@ -144,7 +133,7 @@ export default function PayrollPage() {
       </div>
 
       {/* Create Document Button */}
-      <div className="flex justify-end">
+      <div className="flex justify-end mt-8">
         <button
           className="flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition-all duration-200 hover:opacity-90 hover:-translate-y-0.5 hover:shadow-lg"
           style={{ backgroundColor: "#3338A0", color: "#fff", boxShadow: "0 4px 14px rgba(51,56,160,0.35)" }}

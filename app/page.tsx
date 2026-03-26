@@ -14,10 +14,10 @@ export default function Home() {
       >
         <div className="absolute inset-0 bg-black/60" />
         <h1 className="relative scroll-m-20 text-center text-4xl font-extrabold tracking-tight text-balance text-white">
-          Track Payroll Documents with Ease
+          Track Documents with Ease
         </h1>
         <p className="relative leading-7 [&:not(:first-child)]:mt-6 max-w-lg text-white">
-          Organize and monitor payroll documents with ease while reducing manual
+          Organize and monitor documents with ease while reducing manual
           errors, and maintaining a secure and reliable system.
         </p>
         <Link

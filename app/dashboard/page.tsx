@@ -1,4 +1,13 @@
-import { ArrowUpRight, CheckCircle2, Loader2, XCircle, FileText, Clock, AlertTriangle, TrendingUp } from "lucide-react";
+import {
+  ArrowUpRight,
+  CheckCircle2,
+  Loader2,
+  XCircle,
+  FileText,
+  Clock,
+  AlertTriangle,
+  TrendingUp,
+} from "lucide-react";
 
 const analytics = [
   {
@@ -43,7 +52,10 @@ const analytics = [
   },
 ];
 
-const statusConfig: Record<string, { label: string; icon: React.ReactNode; color: string; bg: string }> = {
+const statusConfig: Record<
+  string,
+  { label: string; icon: React.ReactNode; color: string; bg: string }
+> = {
   completed: {
     label: "Completed",
     icon: <CheckCircle2 className="h-3.5 w-3.5" />,
@@ -67,22 +79,22 @@ const statusConfig: Record<string, { label: string; icon: React.ReactNode; color
 const documents = [
   {
     id: "DTK-2026-001",
-    title: "Payroll Voucher – March 2026",
-    division: "Finance Division",
+    title: "Generate Daily Time Record",
+    division: "Administrative Division",
     date: "Mar 18, 2026",
     status: "completed",
   },
   {
     id: "DTK-2026-002",
-    title: "Leave of Absence Request – J. Santos",
-    division: "HR Division",
+    title: "Approval of Payroll",
+    division: "Assistant Regional Director",
     date: "Mar 20, 2026",
     status: "pending",
   },
   {
     id: "DTK-2026-003",
-    title: "Infrastructure Budget Proposal Q1",
-    division: "Planning Division",
+    title: "Cash Advance",
+    division: "Cash Division",
     date: "Mar 10, 2026",
     status: "overdue",
   },
@@ -90,10 +102,16 @@ const documents = [
 
 export default function DashboardPage() {
   return (
-    <main className="min-h-screen p-6 sm:p-8" style={{ backgroundColor: "#F7F7F7" }}>
+    <main
+      className="min-h-screen p-6 sm:p-8"
+      style={{ backgroundColor: "#F7F7F7" }}
+    >
       {/* Page Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold tracking-tight" style={{ color: "#1E1E2E" }}>
+        <h1
+          className="text-2xl font-bold tracking-tight"
+          style={{ color: "#1E1E2E" }}
+        >
           Dashboard
         </h1>
         <p className="mt-1 text-sm" style={{ color: "#6B7280" }}>
@@ -103,56 +121,71 @@ export default function DashboardPage() {
 
       {/* Analytics Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-        {analytics.map(({ label, value, sub, change, icon: Icon, accent, bg, bar }) => (
-          <div
-            key={label}
-            className="relative rounded-xl p-5 overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
-            style={{ backgroundColor: "#fff", border: "1px solid #E5E7EB", boxShadow: "0 1px 6px rgba(0,0,0,0.05)" }}
-          >
-            {/* Top row */}
-            <div className="flex items-start justify-between mb-3">
-              <div
-                className="flex h-10 w-10 items-center justify-center rounded-lg"
-                style={{ backgroundColor: bg }}
-              >
-                <Icon className="h-5 w-5" style={{ color: accent }} />
+        {analytics.map(
+          ({ label, value, sub, change, icon: Icon, accent, bg, bar }) => (
+            <div
+              key={label}
+              className="relative rounded-xl p-5 overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+              style={{
+                backgroundColor: "#fff",
+                border: "1px solid #E5E7EB",
+                boxShadow: "0 1px 6px rgba(0,0,0,0.05)",
+              }}
+            >
+              {/* Top row */}
+              <div className="flex items-start justify-between mb-3">
+                <div
+                  className="flex h-10 w-10 items-center justify-center rounded-lg"
+                  style={{ backgroundColor: bg }}
+                >
+                  <Icon className="h-5 w-5" style={{ color: accent }} />
+                </div>
+                <span
+                  className="flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold"
+                  style={{ backgroundColor: bg, color: accent }}
+                >
+                  <TrendingUp className="h-3 w-3" />
+                </span>
               </div>
-              <span
-                className="flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold"
-                style={{ backgroundColor: bg, color: accent }}
+
+              {/* Value */}
+              <p
+                className="text-3xl font-bold tracking-tight"
+                style={{ color: "#1E1E2E" }}
               >
-                <TrendingUp className="h-3 w-3" />
-              </span>
-            </div>
+                {value}
+              </p>
+              <p
+                className="mt-0.5 text-sm font-medium"
+                style={{ color: "#374151" }}
+              >
+                {label}
+              </p>
+              <p className="mt-0.5 text-xs" style={{ color: "#9CA3AF" }}>
+                {sub}
+              </p>
 
-            {/* Value */}
-            <p className="text-3xl font-bold tracking-tight" style={{ color: "#1E1E2E" }}>
-              {value}
-            </p>
-            <p className="mt-0.5 text-sm font-medium" style={{ color: "#374151" }}>
-              {label}
-            </p>
-            <p className="mt-0.5 text-xs" style={{ color: "#9CA3AF" }}>
-              {sub}
-            </p>
-
-            {/* Progress bar */}
-            <div className="mt-4 h-1.5 w-full rounded-full" style={{ backgroundColor: "#F3F4F6" }}>
+              {/* Progress bar */}
               <div
-                className="h-1.5 rounded-full transition-all duration-500"
-                style={{ width: `${bar}%`, backgroundColor: accent }}
-              />
-            </div>
+                className="mt-4 h-1.5 w-full rounded-full"
+                style={{ backgroundColor: "#F3F4F6" }}
+              >
+                <div
+                  className="h-1.5 rounded-full transition-all duration-500"
+                  style={{ width: `${bar}%`, backgroundColor: accent }}
+                />
+              </div>
 
-            {/* Change label */}
-            <div className="mt-2 flex items-center gap-1">
-              <ArrowUpRight className="h-3 w-3" style={{ color: accent }} />
-              <span className="text-xs font-medium" style={{ color: accent }}>
-                {change}
-              </span>
+              {/* Change label */}
+              <div className="mt-2 flex items-center gap-1">
+                <ArrowUpRight className="h-3 w-3" style={{ color: accent }} />
+                <span className="text-xs font-medium" style={{ color: accent }}>
+                  {change}
+                </span>
+              </div>
             </div>
-          </div>
-        ))}
+          ),
+        )}
       </div>
 
       {/* Document List */}
@@ -170,7 +203,10 @@ export default function DashboardPage() {
           style={{ borderColor: "#F3F4F6" }}
         >
           <div>
-            <h2 className="text-base font-semibold" style={{ color: "#1E1E2E" }}>
+            <h2
+              className="text-base font-semibold"
+              style={{ color: "#1E1E2E" }}
+            >
               Recent Documents
             </h2>
             <p className="text-xs mt-0.5" style={{ color: "#9CA3AF" }}>
@@ -188,13 +224,18 @@ export default function DashboardPage() {
 
         {/* Column headers */}
         <div
-          className="grid grid-cols-[1fr_auto_auto_auto] gap-4 px-5 py-2.5 text-xs font-semibold uppercase tracking-wider"
-          style={{ backgroundColor: "#F9FAFB", color: "#9CA3AF", borderBottom: "1px solid #F3F4F6" }}
+          className="grid gap-4 px-5 py-2.5 text-xs font-semibold uppercase tracking-wider"
+          style={{
+            gridTemplateColumns: "1fr 2fr 1fr 1fr",
+            backgroundColor: "#F9FAFB",
+            color: "#9CA3AF",
+            borderBottom: "1px solid #F3F4F6",
+          }}
         >
           <span>Document</span>
-          <span className="text-right">Division</span>
-          <span className="text-right">Date</span>
-          <span className="text-right">Status</span>
+          <span>Division</span>
+          <span className="text-center">Date</span>
+          <span className="text-center">Status</span>
         </div>
 
         {/* Rows */}
@@ -203,14 +244,19 @@ export default function DashboardPage() {
           return (
             <div
               key={doc.id}
-              className="grid grid-cols-[1fr_auto_auto_auto] gap-4 items-center px-5 py-4 transition-colors hover:bg-gray-50 cursor-pointer"
+              className="grid gap-4 items-center px-5 py-4 transition-colors hover:bg-gray-50 cursor-pointer"
               style={{
-                borderBottom: i < documents.length - 1 ? "1px solid #F3F4F6" : "none",
+                gridTemplateColumns: "1fr 2fr 1fr 1fr",
+                borderBottom:
+                  i < documents.length - 1 ? "1px solid #F3F4F6" : "none",
               }}
             >
               {/* Title + ID */}
               <div className="min-w-0">
-                <p className="text-sm font-medium truncate" style={{ color: "#111827" }}>
+                <p
+                  className="text-sm font-medium truncate"
+                  style={{ color: "#111827" }}
+                >
                   {doc.title}
                 </p>
                 <p className="text-xs mt-0.5" style={{ color: "#9CA3AF" }}>
@@ -219,22 +265,30 @@ export default function DashboardPage() {
               </div>
 
               {/* Division */}
-              <span className="text-xs whitespace-nowrap" style={{ color: "#6B7280" }}>
+              <span
+                className="text-xs"
+                style={{ color: "#6B7280" }}
+              >
                 {doc.division}
               </span>
 
               {/* Date */}
-              <span className="text-xs whitespace-nowrap" style={{ color: "#6B7280" }}>
+              <span
+                className="text-xs text-center"
+                style={{ color: "#6B7280" }}
+              >
                 {doc.date}
               </span>
 
               {/* Status badge */}
-              <div
-                className="flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap"
-                style={{ backgroundColor: status.bg, color: status.color }}
-              >
-                {status.icon}
-                {status.label}
+              <div className="flex justify-center">
+                <div
+                  className="flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap"
+                  style={{ backgroundColor: status.bg, color: status.color }}
+                >
+                  {status.icon}
+                  {status.label}
+                </div>
               </div>
             </div>
           );

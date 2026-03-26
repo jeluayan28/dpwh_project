@@ -1,7 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Users, Building2, MoreVertical, Pencil, Trash2, ShieldCheck } from "lucide-react";
+import {
+  Users,
+  Building2,
+  MoreVertical,
+  Pencil,
+  Trash2,
+  ShieldCheck,
+} from "lucide-react";
 
 const tabs = [
   { id: "users", label: "Users", icon: Users },
@@ -36,9 +43,30 @@ const users = [
 ];
 
 const departments = [
-  { id: 1, name: "Finance Division", head: "Maria Santos", members: 12, avatar: "FD", avatarColor: "#3338A0" },
-  { id: 2, name: "HR Division", head: "Juan dela Cruz", members: 8, avatar: "HR", avatarColor: "#0891B2" },
-  { id: 3, name: "Planning Division", head: "Ricardo Reyes", members: 15, avatar: "PD", avatarColor: "#7C3AED" },
+  {
+    id: 1,
+    name: "Finance Division",
+    head: "Maria Santos",
+    members: 12,
+    avatar: "FD",
+    avatarColor: "#3338A0",
+  },
+  {
+    id: 2,
+    name: "HR Division",
+    head: "Juan dela Cruz",
+    members: 8,
+    avatar: "HR",
+    avatarColor: "#0891B2",
+  },
+  {
+    id: 3,
+    name: "Planning Division",
+    head: "Ricardo Reyes",
+    members: 15,
+    avatar: "PD",
+    avatarColor: "#7C3AED",
+  },
 ];
 
 export default function RolesPage() {
@@ -46,11 +74,16 @@ export default function RolesPage() {
   const [openMenu, setOpenMenu] = useState<number | null>(null);
 
   return (
-    <main className="min-h-screen p-6 sm:p-8" style={{ backgroundColor: "#F7F7F7" }}>
-
+    <main
+      className="min-h-screen p-6 sm:p-8"
+      style={{ backgroundColor: "#F7F7F7" }}
+    >
       {/* Page Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold tracking-tight" style={{ color: "#1E1E2E" }}>
+        <h1
+          className="text-2xl font-bold tracking-tight"
+          style={{ color: "#1E1E2E" }}
+        >
           User Management
         </h1>
         <p className="mt-1 text-sm" style={{ color: "#6B7280" }}>
@@ -58,21 +91,25 @@ export default function RolesPage() {
         </p>
       </div>
 
-      {/* Tab Menu Bar */}
+      {/* Tab Menu Bar (Underline style like Documents tabs) */}
       <div
-        className="mb-6 flex items-center gap-1 rounded-xl p-1 w-fit"
-        style={{ backgroundColor: "#E8EAF6", border: "1px solid #C5CAE9" }}
+        className="mb-6 flex items-center gap-0 border-b"
+        style={{ borderColor: "#E5E7EB" }}
       >
         {tabs.map(({ id, label, icon: Icon }) => (
           <button
             key={id}
             onClick={() => setActiveTab(id)}
-            className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-200"
-            style={
-              activeTab === id
-                ? { backgroundColor: "#3338A0", color: "#fff", boxShadow: "0 2px 8px rgba(51,56,160,0.25)" }
-                : { backgroundColor: "transparent", color: "#6B7280" }
-            }
+            className="flex items-center gap-2 px-5 py-3.5 text-sm font-semibold transition-all duration-200 relative"
+            style={{
+              color: activeTab === id ? "#3338A0" : "#9CA3AF",
+              borderBottom:
+                activeTab === id
+                  ? "2px solid #3338A0"
+                  : "2px solid transparent",
+              marginBottom: "-1px",
+              background: "transparent",
+            }}
           >
             <Icon className="h-4 w-4" />
             {label}
@@ -84,7 +121,11 @@ export default function RolesPage() {
       {activeTab === "users" && (
         <div
           className="rounded-xl overflow-hidden"
-          style={{ backgroundColor: "#fff", border: "1px solid #E5E7EB", boxShadow: "0 1px 6px rgba(0,0,0,0.05)" }}
+          style={{
+            backgroundColor: "#fff",
+            border: "1px solid #E5E7EB",
+            boxShadow: "0 1px 6px rgba(0,0,0,0.05)",
+          }}
         >
           {/* Table Header */}
           <div
@@ -92,7 +133,12 @@ export default function RolesPage() {
             style={{ borderColor: "#F3F4F6" }}
           >
             <div>
-              <h2 className="text-base font-semibold" style={{ color: "#1E1E2E" }}>Users</h2>
+              <h2
+                className="text-base font-semibold"
+                style={{ color: "#1E1E2E" }}
+              >
+                Users
+              </h2>
               <p className="text-xs mt-0.5" style={{ color: "#9CA3AF" }}>
                 {users.length} registered users
               </p>
@@ -109,7 +155,11 @@ export default function RolesPage() {
           {/* Column Headers */}
           <div
             className="grid grid-cols-[2fr_2fr_2fr_auto] gap-4 px-5 py-2.5 text-xs font-semibold uppercase tracking-wider"
-            style={{ backgroundColor: "#F9FAFB", color: "#9CA3AF", borderBottom: "1px solid #F3F4F6" }}
+            style={{
+              backgroundColor: "#F9FAFB",
+              color: "#9CA3AF",
+              borderBottom: "1px solid #F3F4F6",
+            }}
           >
             <span>Name</span>
             <span>Department</span>
@@ -122,7 +172,10 @@ export default function RolesPage() {
             <div
               key={user.id}
               className="grid grid-cols-[2fr_2fr_2fr_auto] gap-4 items-center px-5 py-4 transition-colors hover:bg-gray-50"
-              style={{ borderBottom: i < users.length - 1 ? "1px solid #F3F4F6" : "none" }}
+              style={{
+                borderBottom:
+                  i < users.length - 1 ? "1px solid #F3F4F6" : "none",
+              }}
             >
               {/* Name + Avatar */}
               <div className="flex items-center gap-3 min-w-0">
@@ -132,7 +185,10 @@ export default function RolesPage() {
                 >
                   {user.avatar}
                 </div>
-                <span className="text-sm font-medium truncate" style={{ color: "#111827" }}>
+                <span
+                  className="text-sm font-medium truncate"
+                  style={{ color: "#111827" }}
+                >
                   {user.name}
                 </span>
               </div>
@@ -150,7 +206,9 @@ export default function RolesPage() {
               {/* Menu */}
               <div className="relative flex justify-end">
                 <button
-                  onClick={() => setOpenMenu(openMenu === user.id ? null : user.id)}
+                  onClick={() =>
+                    setOpenMenu(openMenu === user.id ? null : user.id)
+                  }
                   className="rounded-md p-1.5 transition-colors hover:bg-gray-100"
                   style={{ color: "#9CA3AF" }}
                 >
@@ -160,14 +218,20 @@ export default function RolesPage() {
                 {openMenu === user.id && (
                   <div
                     className="absolute right-0 top-8 z-20 w-36 rounded-lg py-1 shadow-lg"
-                    style={{ backgroundColor: "#fff", border: "1px solid #E5E7EB" }}
+                    style={{
+                      backgroundColor: "#fff",
+                      border: "1px solid #E5E7EB",
+                    }}
                   >
                     <button
                       className="flex w-full items-center gap-2 px-3 py-2 text-xs font-medium transition-colors hover:bg-gray-50"
                       style={{ color: "#374151" }}
                       onClick={() => setOpenMenu(null)}
                     >
-                      <Pencil className="h-3.5 w-3.5" style={{ color: "#3338A0" }} />
+                      <Pencil
+                        className="h-3.5 w-3.5"
+                        style={{ color: "#3338A0" }}
+                      />
                       Edit User
                     </button>
                     <button
@@ -190,7 +254,11 @@ export default function RolesPage() {
       {activeTab === "departments" && (
         <div
           className="rounded-xl overflow-hidden"
-          style={{ backgroundColor: "#fff", border: "1px solid #E5E7EB", boxShadow: "0 1px 6px rgba(0,0,0,0.05)" }}
+          style={{
+            backgroundColor: "#fff",
+            border: "1px solid #E5E7EB",
+            boxShadow: "0 1px 6px rgba(0,0,0,0.05)",
+          }}
         >
           {/* Table Header */}
           <div
@@ -198,7 +266,12 @@ export default function RolesPage() {
             style={{ borderColor: "#F3F4F6" }}
           >
             <div>
-              <h2 className="text-base font-semibold" style={{ color: "#1E1E2E" }}>Departments</h2>
+              <h2
+                className="text-base font-semibold"
+                style={{ color: "#1E1E2E" }}
+              >
+                Departments
+              </h2>
               <p className="text-xs mt-0.5" style={{ color: "#9CA3AF" }}>
                 {departments.length} divisions
               </p>
@@ -215,7 +288,11 @@ export default function RolesPage() {
           {/* Column Headers */}
           <div
             className="grid grid-cols-[2fr_2fr_auto_auto] gap-4 px-5 py-2.5 text-xs font-semibold uppercase tracking-wider"
-            style={{ backgroundColor: "#F9FAFB", color: "#9CA3AF", borderBottom: "1px solid #F3F4F6" }}
+            style={{
+              backgroundColor: "#F9FAFB",
+              color: "#9CA3AF",
+              borderBottom: "1px solid #F3F4F6",
+            }}
           >
             <span>Department</span>
             <span>Head</span>
@@ -228,7 +305,10 @@ export default function RolesPage() {
             <div
               key={dept.id}
               className="grid grid-cols-[2fr_2fr_auto_auto] gap-4 items-center px-5 py-4 transition-colors hover:bg-gray-50"
-              style={{ borderBottom: i < departments.length - 1 ? "1px solid #F3F4F6" : "none" }}
+              style={{
+                borderBottom:
+                  i < departments.length - 1 ? "1px solid #F3F4F6" : "none",
+              }}
             >
               {/* Name + Avatar */}
               <div className="flex items-center gap-3 min-w-0">
@@ -238,7 +318,10 @@ export default function RolesPage() {
                 >
                   {dept.avatar}
                 </div>
-                <span className="text-sm font-medium truncate" style={{ color: "#111827" }}>
+                <span
+                  className="text-sm font-medium truncate"
+                  style={{ color: "#111827" }}
+                >
                   {dept.name}
                 </span>
               </div>
@@ -259,7 +342,11 @@ export default function RolesPage() {
               {/* Menu */}
               <div className="relative flex justify-end">
                 <button
-                  onClick={() => setOpenMenu(openMenu === dept.id + 100 ? null : dept.id + 100)}
+                  onClick={() =>
+                    setOpenMenu(
+                      openMenu === dept.id + 100 ? null : dept.id + 100,
+                    )
+                  }
                   className="rounded-md p-1.5 transition-colors hover:bg-gray-100"
                   style={{ color: "#9CA3AF" }}
                 >
@@ -269,14 +356,20 @@ export default function RolesPage() {
                 {openMenu === dept.id + 100 && (
                   <div
                     className="absolute right-0 top-8 z-20 w-40 rounded-lg py-1 shadow-lg"
-                    style={{ backgroundColor: "#fff", border: "1px solid #E5E7EB" }}
+                    style={{
+                      backgroundColor: "#fff",
+                      border: "1px solid #E5E7EB",
+                    }}
                   >
                     <button
                       className="flex w-full items-center gap-2 px-3 py-2 text-xs font-medium transition-colors hover:bg-gray-50"
                       style={{ color: "#374151" }}
                       onClick={() => setOpenMenu(null)}
                     >
-                      <Pencil className="h-3.5 w-3.5" style={{ color: "#3338A0" }} />
+                      <Pencil
+                        className="h-3.5 w-3.5"
+                        style={{ color: "#3338A0" }}
+                      />
                       Edit Department
                     </button>
                     <button
@@ -294,7 +387,6 @@ export default function RolesPage() {
           ))}
         </div>
       )}
-
     </main>
   );
 }
