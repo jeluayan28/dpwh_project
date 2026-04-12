@@ -143,7 +143,7 @@ export default function RolesPage() {
       {/* Users Tab */}
       {activeTab === "users" && (
         <div
-          className="rounded-xl overflow-hidden"
+          className="rounded-xl overflow-visible"
           style={{ backgroundColor: "#fff", border: "1px solid #E5E7EB", boxShadow: "0 1px 6px rgba(0,0,0,0.05)" }}
         >
           <div className="flex items-center justify-between px-5 py-4 border-b" style={{ borderColor: "#F3F4F6" }}>
@@ -234,7 +234,7 @@ export default function RolesPage() {
                   </button>
                   {openMenu === user.user_id && (
                     <div
-                      className="absolute right-0 top-8 z-20 w-36 rounded-lg py-1 shadow-lg"
+                      className="absolute right-0 top-8 z-50 w-36 rounded-lg py-1 shadow-lg"
                       style={{ backgroundColor: "#fff", border: "1px solid #E5E7EB" }}
                     >
                       <button
@@ -265,7 +265,7 @@ export default function RolesPage() {
       {/* Departments Tab */}
       {activeTab === "departments" && (
         <div
-          className="rounded-xl overflow-hidden"
+          className="rounded-xl overflow-visible"
           style={{ backgroundColor: "#fff", border: "1px solid #E5E7EB", boxShadow: "0 1px 6px rgba(0,0,0,0.05)" }}
         >
           <div className="flex items-center justify-between px-5 py-4 border-b" style={{ borderColor: "#F3F4F6" }}>
