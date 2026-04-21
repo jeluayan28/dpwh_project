@@ -4,6 +4,7 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 
 import { cn } from "@/lib/utils";
+import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -20,9 +21,59 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<"div">) {
   const router = useRouter();
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [error, setError] = React.useState<string | null>(null);
+  const [loading, setLoading] = React.useState(false);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setError(null);
+    setLoading(true);
+
+    // Look up the user in the Users table by email, join their role
+    const { data: users, error: dbError } = await supabase
+      .from("Users")
+      .select("user_id, name, email, password, status, role_id, Roles(role_name)")
+      .ilike("email", email)
+      .limit(1);
+
+    setLoading(false);
+
+    if (dbError) {
+      setError("Something went wrong. Please try again.");
+      return;
+    }
+
+    if (!users || users.length === 0) {
+      setError("No account found with that email.");
+      return;
+    }
+
+    const user = users[0];
+
+    if (!user.status) {
+      setError("Your account is inactive. Contact your administrator.");
+      return;
+    }
+
+    if (user.password !== password) {
+      setError("Incorrect password.");
+      return;
+    }
+
+    // Save session to localStorage (for UI) and cookie (for middleware)
+    const rolesData = user.Roles as unknown as { role_name: string } | null;
+    const roleName = rolesData?.role_name ?? "Staff";
+    const sessionData = JSON.stringify({
+      user_id: user.user_id,
+      name: user.name,
+      email: user.email,
+      role: roleName,
+    });
+    localStorage.setItem("dpwh_session", sessionData);
+    document.cookie = `dpwh_session=${encodeURIComponent(sessionData)}; path=/; SameSite=Lax`;
+
     router.push("/dashboard");
   }
 
@@ -39,6 +90,12 @@ export function LoginForm({
                 </p>
               </div>
 
+              {error && (
+                <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+                  {error}
+                </div>
+              )}
+
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
@@ -47,6 +104,8 @@ export function LoginForm({
                   placeholder="john.doe@example.com"
                   required
                   className="bg-muted"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </Field>
 
@@ -60,11 +119,20 @@ export function LoginForm({
                     Forgot your password?
                   </a>
                 </div>
-                <Input id="password" type="password" required className="bg-muted" />
+                <Input
+                  id="password"
+                  type="password"
+                  required
+                  className="bg-muted"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
               </Field>
 
               <Field>
-                <Button type="submit">Login</Button>
+                <Button type="submit" disabled={loading}>
+                  {loading ? "Logging in…" : "Login"}
+                </Button>
               </Field>
 
               <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">

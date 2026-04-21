@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useSession } from "@/lib/useSession";
 import { Mail, Phone, Building2, PanelLeftClose, PanelLeftOpen, LayoutDashboard, FileText, Users, Settings, LogOut, ChevronUp } from "lucide-react";
 
 import {
@@ -18,15 +19,32 @@ type LayoutShellProps = {
 
 export function LayoutShell({ children }: LayoutShellProps) {
   const pathname = usePathname();
-  const isDashboardRoute = pathname.startsWith("/dashboard") || pathname.startsWith("/payroll") || pathname.startsWith("/admin") || pathname.startsWith("/user");
+  const router = useRouter();
+  const isDashboardRoute =
+    pathname.startsWith("/dashboard") ||
+    pathname.startsWith("/payroll") ||
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/user");
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const { user, isAdmin } = useSession();
+  const userEmail = user?.email ?? null;
+  const userInitial = (user?.email?.[0] ?? user?.name?.[0] ?? "U").toUpperCase();
+
+  function handleLogout() {
+    setUserMenuOpen(false);
+    localStorage.removeItem("dpwh_session");
+    document.cookie = "dpwh_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    // Hard redirect so the browser discards history and can't go back to a cached protected page
+    window.location.replace("/login");
+  }
 
   const navItems = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { href: "/payroll", label: "Documents", icon: FileText },
-    { href: "/admin/roles", label: "User Management", icon: Users },
+    // Only visible to Admins
+    ...(isAdmin ? [{ href: "/admin/roles", label: "User Management", icon: Users }] : []),
   ];
 
   if (isDashboardRoute) {
@@ -115,16 +133,17 @@ export function LayoutShell({ children }: LayoutShellProps) {
                 style={{
                   backgroundColor: "#fff",
                   border: "1px solid #E5E7EB",
-                  width: "200px",
                   ...(sidebarOpen
-                    ? { bottom: "100%", left: "0.75rem", right: "0.75rem", width: "auto", marginBottom: "0.5rem" }
-                    : { bottom: "0", left: "calc(100% + 8px)" }),
+                    ? { bottom: "100%", left: "0.75rem", right: "0.75rem", marginBottom: "0.5rem" }
+                    : { bottom: "0", left: "calc(100% + 8px)", width: "200px" }),
                 }}
               >
                 {/* User info header */}
                 <div className="px-3 py-2.5 border-b" style={{ borderColor: "#F3F4F6" }}>
-                  <p className="text-xs font-semibold truncate" style={{ color: "#111827" }}>Maria Santos</p>
-                  <p className="text-xs truncate" style={{ color: "#9CA3AF" }}>user@dpwh.gov.ph</p>
+                  <p className="text-xs font-semibold truncate" style={{ color: "#111827" }}>
+                    {userEmail ?? "—"}
+                  </p>
+                  <p className="text-xs truncate" style={{ color: "#9CA3AF" }}>Signed in</p>
                 </div>
                 <div className="py-1">
                   <Link
@@ -136,15 +155,14 @@ export function LayoutShell({ children }: LayoutShellProps) {
                     <Settings className="h-4 w-4" style={{ color: "#6B7280" }} />
                     Account Settings
                   </Link>
-                  <Link
-                    href="/"
-                    onClick={() => setUserMenuOpen(false)}
+                  <button
+                    onClick={handleLogout}
                     className="flex w-full items-center gap-2.5 px-3 py-2 text-sm transition-colors hover:bg-gray-50"
                     style={{ color: "#DC2626" }}
                   >
                     <LogOut className="h-4 w-4" />
                     Log out
-                  </Link>
+                  </button>
                 </div>
               </div>
             )}
@@ -159,11 +177,13 @@ export function LayoutShell({ children }: LayoutShellProps) {
                   className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
                   style={{ backgroundColor: "rgba(255,255,255,0.2)" }}
                 >
-                  U
+                  {userInitial}
                 </div>
                 <div className="flex-1 min-w-0 text-left">
                   <p className="text-xs whitespace-nowrap" style={{ color: "rgba(255,255,255,0.55)" }}>Logged in as</p>
-                  <p className="truncate text-sm font-medium text-white">user@dpwh.gov.ph</p>
+                  <p className="truncate text-sm font-medium text-white">
+                    {userEmail ?? "…"}
+                  </p>
                 </div>
                 <ChevronUp
                   className="h-3.5 w-3.5 shrink-0 transition-transform duration-200"
@@ -175,9 +195,9 @@ export function LayoutShell({ children }: LayoutShellProps) {
                 onClick={() => setUserMenuOpen((o) => !o)}
                 className="mx-auto flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold text-white transition-colors hover:bg-white/30"
                 style={{ backgroundColor: "rgba(255,255,255,0.2)" }}
-                title="user@dpwh.gov.ph"
+                title={userEmail ?? undefined}
               >
-                U
+                {userInitial}
               </button>
             )}
           </div>
