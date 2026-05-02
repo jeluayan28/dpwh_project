@@ -1,193 +1,208 @@
 # Project Checklist
 
-This is the clean status of the project based on the work currently in the repo.
+This checklist is now aligned to the functional requirements you provided.
 
-Important current note:
+## Overall Status Summary
 
-- RLS is currently **disabled** in Supabase
-- that means the app is relying mainly on:
-  - backend API routes
-  - middleware
-  - frontend session checks
-- the RLS documentation is still useful as a future reference, but it is **not active right now**
+### Mostly done
 
-## What Was Already In The Repo Before
+- document tracking backend
+- chain of custody / online logbook
+- document upload and file viewing
+- admin user/department APIs
 
-- basic Next.js app structure
-- landing page and login page
-- custom login using `Users` table and local cookie/localStorage session
-- dashboard/documents/admin pages with direct frontend Supabase usage
-- Supabase client setup
-- basic database tables already existing in Supabase:
-  - `Documents`
-  - `Document_Logs`
-  - `Document_Status_History`
-  - `Users`
-  - `Departments`
-  - `Roles`
-  - `Signatures`
+### Partly done
 
-## What You Achieved Since Pulling From GitHub
+- overdue automation
+- administrative management
+- role-based access
 
-### Document tracking backend
+### Not done
 
-- [x] Create document with unique tracking number
-- [x] Move documents between departments
-- [x] Record movement in `Document_Logs`
-- [x] Record status changes in `Document_Status_History`
-- [x] Build chain-of-custody backend response
-- [x] Add backend services for document logic
-- [x] Add backend routes for documents, logs, status, and custody view
+- DocuSign workflow
+- Better-Auth
+- dynamic permission-based RBAC
+- automated tests
 
-### Document tracking frontend
+---
 
-- [x] Switch documents page from direct Supabase writes to backend API
-- [x] Upload document attachment to Supabase Storage
-- [x] Save uploaded file URL in `Documents.file_url`
-- [x] Show `View File` link on documents page
-- [x] Open document details modal
-- [x] Show chain of custody in UI
-- [x] Show status history in UI
-- [x] Add visual tracker/timeline in UI
-- [x] Add move-document form in UI
-- [x] Add change-status form in UI
+# 3. Functional Requirements
 
-### Status flags
+## 3.1 Document Tracking & Logbook
 
-- [x] Support manual `Urgent` flag
-- [x] Add overdue detection backend logic
-- [x] Add overdue internal API route
-- [x] Add SQL/examples for overdue handling
+### Unique Tracking Number
 
-### Admin management
+- [x] Every document has a generated unique tracking number
 
-- [x] Build backend APIs for users
-- [x] Build backend APIs for departments
-- [x] Build backend API for roles list
-- [x] Validate unique email
-- [x] Validate role existence
-- [x] Validate department existence
-- [x] Enforce one active user per department in backend logic
-- [x] Add partial unique index guidance for one-active-user-per-department
-- [x] Convert admin page from direct Supabase usage to backend APIs
+### Division Staging
 
-### API structure and docs
+- [x] Track when a document enters a division
+- [x] Track when a document leaves a division
+- [x] Store timestamps in `Document_Logs`
+- [x] Show timestamps in the tracker/details UI
+- [ ] Add stricter validation so every move always has complete staging data if required by your final rules
 
-- [x] Add master API structure documentation
-- [x] Add document tracking API doc
-- [x] Add SQL query examples
-- [x] Add admin management doc
-- [x] Add status flags doc
-- [x] Add testing/debugging doc
-- [x] Add RLS planning doc
+### Status Flags
 
-## What Is Partially Done
+#### Urgent
 
-### Status flags
+- [x] Manual urgent toggle exists in the UI
+- [x] Urgent value is saved in the database
 
-- [x] overdue logic exists
-- [ ] overdue logic is not yet scheduled automatically
-- [ ] overdue indicator can still be improved in the UI
+#### Overdue
 
-### Security
+- [x] Overdue backend logic exists
+- [x] Overdue route exists
+- [x] Overdue SQL/examples are documented
+- [ ] Overdue checker is not yet scheduled automatically
+- [ ] Overdue is not yet fully “automatic” until scheduler/cron is enabled
 
-- [x] backend routes now protect a lot of data flow
-- [x] middleware protects route access at app level
-- [ ] true database-level per-user RLS is not active
-- [ ] current login is still custom, not Supabase Auth
+### Online Logbook / Chain of Custody
 
-### Testing
+- [x] Digital history exists in backend
+- [x] Chain of custody API exists
+- [x] Movement log uses `Document_Logs`
+- [x] Status history uses `Document_Status_History`
+- [x] Frontend document details modal shows chain of custody
+- [x] Visual tracker/timeline exists in the UI
+- [x] Users can move documents between departments from the UI
+- [x] Users can update status from the UI
 
-- [x] main edited files passed lint/type-check while being developed
-- [ ] no automated test suite was added
-- [ ] no e2e tests were added
+## 3.2 Administrative Management
 
-## What Is Still Lacking / Not Completed
+### Dynamic Role-Based Access Control (RAC)
 
-### 5. Status Flags
+- [x] Users can be assigned to an existing role
+- [x] Roles can be fetched from backend API
+- [ ] Admin cannot yet create new roles from the UI
+- [ ] Admin cannot yet edit/delete roles from the UI
+- [ ] Specific permissions per role are not yet implemented
+- [ ] Permission management without code deployment is not yet implemented
+- [ ] Real RBAC is only partial right now because role names exist, but permission rules are not dynamically configurable
 
-- [ ] schedule overdue checker automatically
-  - example: Vercel Cron, Supabase scheduled function, GitHub Actions, or `pg_cron`
-- [ ] optionally add clearer overdue badge/explanation in more pages
+### Department Limit
 
-### 8. DocuSign Integration
+- [x] One active account per department is enforced in backend validation
+- [x] SQL/index guidance exists for one-active-user-per-department
+- [x] Admin page now uses backend APIs for user/department management
 
-- [ ] send documents for signing
-- [ ] track signing status
-- [ ] store signed document references
-- [ ] implement backend DocuSign handling
-- [ ] write integration guide with real project flow
+## 3.3 Payroll Integration
 
-### 9. Row Level Security (RLS)
+### DocuSign Workflow
 
-- [ ] decide whether you really want RLS enabled now
-- [ ] if yes, re-enable it and apply matching policies
-- [ ] migrate to Supabase Auth if you want real per-user database RLS
-- [ ] add document assignment/current department fields if you want simpler future RLS
+- [ ] Send documents for digital signature is not implemented
+- [ ] Track signing status is not implemented
+- [ ] Store signed document references is not implemented
+- [ ] Full Accounting-to-DocuSign workflow is not implemented
 
-### 10. Testing & Debugging
+---
 
-- [ ] add actual automated tests
-- [ ] add deployment/runtime checklist
-- [ ] test all main flows end-to-end in the browser
+# 4. Technical Stack (Proposed)
 
-### Project cleanup / polish
+## Frontend: Next.js (App Router) + TypeScript
 
-- [ ] replace the default README with a real project README
-- [ ] decide whether to keep old compatibility routes if not needed
-- [ ] clean up any remaining direct frontend Supabase access if you want a strict backend-only architecture
-- [ ] review plain-text password handling in login/users flow
-- [ ] add better success/error toasts or notifications
+- [x] Implemented
 
-## Most Important Functional Risks Still Present
+## UI Components: shadcn/ui + TanStack Table
 
-- [ ] login still uses plain password comparison from the `Users` table
-- [ ] RLS is disabled, so database-level access control is not enforced right now
-- [ ] overdue auto-check is not scheduled yet
-- [ ] DocuSign is not implemented
-- [ ] no automated testing safety net exists
+- [x] shadcn/ui is being used
+- [ ] TanStack Table is not yet implemented for the tracker/table flow
 
-## Recommended Next Priorities
+## Backend Logic: Services Folder (Data Access Layer)
 
-Do these in this order if you want the strongest progress:
+- [x] Implemented
+- [x] Document service exists
+- [x] Admin service exists
+- [x] Overdue service exists
 
-1. Replace default README with real project documentation
-2. Decide security direction:
-   - keep backend-route model for now
-   - or migrate toward Supabase Auth + RLS
-3. Schedule overdue checker
-4. Implement DocuSign
-5. Add automated tests
+## Database: Supabase
 
-## Are All Docs Necessary?
+- [x] Implemented
 
-### Keep these
+## Auth: Better-Auth
+
+- [ ] Not implemented
+- [ ] App is still using a custom cookie/localStorage session flow
+
+## API: DocuSign SDK
+
+- [ ] Not implemented as a complete working integration
+
+---
+
+# Security / Access Control Reality Check
+
+- [x] Middleware protects admin and logged-in routes at app level
+- [x] More app logic now uses backend API routes instead of direct client writes
+- [ ] RLS is currently disabled
+- [ ] True database-level access control is not active
+- [ ] Login still uses plain password comparison from the `Users` table
+- [ ] Better-Auth is not active
+
+---
+
+# Testing / Stability
+
+- [x] Lint/type-check were used during implementation
+- [x] Debugging checklist doc exists
+- [ ] Automated tests are not implemented
+- [ ] End-to-end tests are not implemented
+- [ ] Full QA pass across all flows is still needed
+
+---
+
+# Documentation Status
+
+## Keep these
 
 - [x] `docs/project-checklist.md`
-  - keep, this is your status tracker
 - [x] `docs/api-structure.md`
-  - keep, useful as your main backend overview
 - [x] `docs/document-tracking-api.md`
-  - keep, useful for document routes specifically
 - [x] `docs/document-tracking.sql`
-  - keep, useful for schema/index guidance
 - [x] `docs/document-tracking-example-queries.sql`
-  - keep, useful for testing and reporting
 - [x] `docs/status-flags.md`
-  - keep, useful because overdue scheduling is still unfinished
 - [x] `docs/admin-management.md`
-  - keep, useful for admin API and validation logic
 - [x] `docs/testing-debugging.md`
-  - keep, useful during development
 
-### Optional / keep only as reference
+## Optional
 
 - [ ] `docs/rls.md`
-  - optional right now because RLS is disabled
-  - keep only if you plan to re-enable RLS later
+  - optional if RLS stays disabled
+  - useful if you plan to re-enable RLS later
 
-## Docs You Are Still Missing
+## Still missing
 
-- [ ] a real root `README.md` for the actual project
-- [ ] DocuSign integration doc after implementation
-- [ ] deployment/setup guide for env vars, storage bucket, cron setup, and Supabase SQL steps
+- [ ] Real project `README.md`
+- [ ] DocuSign integration documentation after implementation
+- [ ] Better-Auth setup documentation if you migrate auth
+
+---
+
+# Biggest Remaining Gaps
+
+These are the main unfinished parts of the system:
+
+1. Overdue scheduler automation
+2. Dynamic role and permission management
+3. Full DocuSign integration
+4. Better-Auth migration
+5. Secure password/auth flow
+6. Real RLS if you want DB-level enforcement
+7. TanStack Table if that is a strict requirement
+8. Automated testing
+9. Proper README
+
+---
+
+# Recommended Next Priorities
+
+If you want to finish the project in the most practical order:
+
+1. Replace default README with a real project README
+2. Decide security direction:
+   - keep custom session temporarily
+   - or migrate to Better-Auth
+3. Automate overdue scheduler
+4. Implement dynamic role/permission management
+5. Implement DocuSign workflow
+6. Add automated tests
