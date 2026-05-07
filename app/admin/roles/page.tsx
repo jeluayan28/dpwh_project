@@ -12,7 +12,6 @@ import {
   X,
   AlertTriangle,
 } from "lucide-react";
-import { supabase } from "@/lib/supabase";
 
 const tabs = [
   { id: "users", label: "Users", icon: Users },
@@ -47,6 +46,23 @@ type DeptRow = {
 };
 
 type RoleRow = { role_id: number; role_name: string };
+
+type ApiResponse<T> = {
+  data?: T;
+  error?: string;
+};
+
+async function readJson<T>(response: Response): Promise<ApiResponse<T>> {
+  return (await response.json()) as ApiResponse<T>;
+}
+
+async function requireData<T>(response: Response, fallback: string) {
+  const result = await readJson<T>(response);
+  if (!response.ok || result.data === undefined) {
+    throw new Error(result.error ?? fallback);
+  }
+  return result.data;
+}
 
 // ─── Shared field ─────────────────────────────────────────────────────────────
 function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
@@ -119,12 +135,20 @@ function AddDepartmentModal({ onClose, onAdded }: {
     e.preventDefault();
     setError(null);
     setSaving(true);
-    const { data, error: err } = await supabase
-      .from("Departments").insert({ department_name: name, description }).select("*").single();
-    setSaving(false);
-    if (err) { setError(err.message); return; }
-    onAdded({ ...data, member_count: 0 });
-    onClose();
+    try {
+      const response = await fetch("/api/admin/departments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ department_name: name, description }),
+      });
+      const data = await requireData<DeptRow>(response, "Unable to add department.");
+      onAdded({ ...data, member_count: 0 });
+      onClose();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to add department.");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -167,13 +191,27 @@ function AddUserModal({ roles, departments, onClose, onAdded }: {
     e.preventDefault();
     setError(null);
     setSaving(true);
-    const { data, error: err } = await supabase
-      .from("Users").insert({ name, email, password, role_id: roleId, department_id: deptId, status })
-      .select("*, Departments(department_name), Roles(role_name)").single();
-    setSaving(false);
-    if (err) { setError(err.message); return; }
-    onAdded(data as UserRow);
-    onClose();
+    try {
+      const response = await fetch("/api/admin/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+          role_id: roleId,
+          department_id: deptId,
+          status,
+        }),
+      });
+      const data = await requireData<UserRow>(response, "Unable to add user.");
+      onAdded(data);
+      onClose();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to add user.");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -242,14 +280,20 @@ function EditUserModal({ user, roles, departments, onClose, onUpdated }: {
     const updates: Record<string, unknown> = { name, email, role_id: roleId, department_id: deptId, status };
     if (password) updates.password = password;
 
-    const { data, error: err } = await supabase
-      .from("Users").update(updates).eq("user_id", user.user_id)
-      .select("*, Departments(department_name), Roles(role_name)").single();
-
-    setSaving(false);
-    if (err) { setError(err.message); return; }
-    onUpdated(data as UserRow);
-    onClose();
+    try {
+      const response = await fetch(`/api/admin/users/${user.user_id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updates),
+      });
+      const data = await requireData<UserRow>(response, "Unable to update user.");
+      onUpdated(data);
+      onClose();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to update user.");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -309,16 +353,20 @@ function EditDepartmentModal({ dept, onClose, onUpdated }: {
     e.preventDefault();
     setError(null);
     setSaving(true);
-    const { data, error: err } = await supabase
-      .from("Departments")
-      .update({ department_name: name, description })
-      .eq("department_id", dept.department_id)
-      .select("*")
-      .single();
-    setSaving(false);
-    if (err) { setError(err.message); return; }
-    onUpdated(data as DeptRow);
-    onClose();
+    try {
+      const response = await fetch(`/api/admin/departments/${dept.department_id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ department_name: name, description }),
+      });
+      const data = await requireData<DeptRow>(response, "Unable to update department.");
+      onUpdated(data);
+      onClose();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to update department.");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -394,33 +442,69 @@ export default function RolesPage() {
   const [deletingDept, setDeletingDept] = useState<DeptRow | null>(null);
   const [deleteDeptLoading, setDeleteDeptLoading] = useState(false);
 
+  function mergeDepartmentCounts(
+    departmentRows: DeptRow[],
+    userRows: UserRow[],
+  ): (DeptRow & { member_count: number })[] {
+    const countMap: Record<number, number> = {};
+    userRows.forEach((user) => {
+      countMap[user.department_id] = (countMap[user.department_id] ?? 0) + 1;
+    });
+    return departmentRows.map((dept) => ({
+      ...dept,
+      member_count: countMap[dept.department_id] ?? 0,
+    }));
+  }
+
   useEffect(() => {
     async function fetchUsers() {
-      const { data, error } = await supabase.from("Users").select("*, Departments(department_name), Roles(role_name)");
-      if (error) console.error(error.message);
-      else setUsers(data ?? []);
-      setLoadingUsers(false);
+      try {
+        const response = await fetch("/api/admin/users", { cache: "no-store" });
+        const data = await requireData<UserRow[]>(response, "Unable to load users.");
+        setUsers(data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoadingUsers(false);
+      }
     }
     fetchUsers();
   }, []);
 
   useEffect(() => {
     async function fetchRoles() {
-      const { data } = await supabase.from("Roles").select("role_id, role_name");
-      setRoles(data ?? []);
+      try {
+        const response = await fetch("/api/admin/roles", { cache: "no-store" });
+        const data = await requireData<RoleRow[]>(response, "Unable to load roles.");
+        setRoles(data);
+      } catch (error) {
+        console.error(error);
+      }
     }
     fetchRoles();
   }, []);
 
   useEffect(() => {
     async function fetchDepartments() {
-      const { data, error } = await supabase.from("Departments").select("*");
-      if (error) { setLoadingDepts(false); return; }
-      const { data: userCounts } = await supabase.from("Users").select("department_id");
-      const countMap: Record<number, number> = {};
-      (userCounts ?? []).forEach((u) => { countMap[u.department_id] = (countMap[u.department_id] ?? 0) + 1; });
-      setDepartments((data ?? []).map((dept) => ({ ...dept, member_count: countMap[dept.department_id] ?? 0 })));
-      setLoadingDepts(false);
+      try {
+        const [departmentsResponse, usersResponse] = await Promise.all([
+          fetch("/api/admin/departments", { cache: "no-store" }),
+          fetch("/api/admin/users", { cache: "no-store" }),
+        ]);
+        const departmentRows = await requireData<DeptRow[]>(
+          departmentsResponse,
+          "Unable to load departments.",
+        );
+        const userRows = await requireData<UserRow[]>(
+          usersResponse,
+          "Unable to load users.",
+        );
+        setDepartments(mergeDepartmentCounts(departmentRows, userRows));
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoadingDepts(false);
+      }
     }
     fetchDepartments();
   }, []);
@@ -428,21 +512,48 @@ export default function RolesPage() {
   async function handleDeleteUser() {
     if (!deletingUser) return;
     setDeleteLoading(true);
-    const { error } = await supabase.from("Users").delete().eq("user_id", deletingUser.user_id);
-    setDeleteLoading(false);
-    if (error) { alert(error.message); return; }
-    setUsers((prev) => prev.filter((u) => u.user_id !== deletingUser.user_id));
-    setDeletingUser(null);
+    try {
+      const response = await fetch(`/api/admin/users/${deletingUser.user_id}`, {
+        method: "DELETE",
+      });
+      const result = await readJson<{ success: boolean }>(response);
+      if (!response.ok) {
+        throw new Error(result.error ?? "Unable to delete user.");
+      }
+      setUsers((prev) => prev.filter((u) => u.user_id !== deletingUser.user_id));
+      setDepartments((prev) =>
+        prev.map((dept) =>
+          dept.department_id === deletingUser.department_id
+            ? { ...dept, member_count: Math.max((dept.member_count ?? 1) - 1, 0) }
+            : dept,
+        ),
+      );
+      setDeletingUser(null);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Unable to delete user.");
+    } finally {
+      setDeleteLoading(false);
+    }
   }
 
   async function handleDeleteDept() {
     if (!deletingDept) return;
     setDeleteDeptLoading(true);
-    const { error } = await supabase.from("Departments").delete().eq("department_id", deletingDept.department_id);
-    setDeleteDeptLoading(false);
-    if (error) { alert(error.message); return; }
-    setDepartments((prev) => prev.filter((d) => d.department_id !== deletingDept.department_id));
-    setDeletingDept(null);
+    try {
+      const response = await fetch(`/api/admin/departments/${deletingDept.department_id}`, {
+        method: "DELETE",
+      });
+      const result = await readJson<{ success: boolean }>(response);
+      if (!response.ok) {
+        throw new Error(result.error ?? "Unable to delete department.");
+      }
+      setDepartments((prev) => prev.filter((d) => d.department_id !== deletingDept.department_id));
+      setDeletingDept(null);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Unable to delete department.");
+    } finally {
+      setDeleteDeptLoading(false);
+    }
   }
 
   return (
@@ -450,7 +561,16 @@ export default function RolesPage() {
 
       {showAddUser && (
         <AddUserModal roles={roles} departments={departments} onClose={() => setShowAddUser(false)}
-          onAdded={(u) => setUsers((prev) => [u, ...prev])} />
+          onAdded={(u) => {
+            setUsers((prev) => [u, ...prev]);
+            setDepartments((prev) =>
+              prev.map((d) =>
+                d.department_id === u.department_id
+                  ? { ...d, member_count: (d.member_count ?? 0) + 1 }
+                  : d,
+              ),
+            );
+          }} />
       )}
 
       {showAddDept && (
@@ -462,7 +582,20 @@ export default function RolesPage() {
         <EditUserModal user={editingUser} roles={roles} departments={departments}
           onClose={() => setEditingUser(null)}
           onUpdated={(updated) => {
+            const previousDepartmentId = editingUser.department_id;
             setUsers((prev) => prev.map((u) => u.user_id === updated.user_id ? updated : u));
+            setDepartments((prev) => {
+              const adjusted = prev.map((d) => {
+                if (d.department_id === previousDepartmentId && previousDepartmentId !== updated.department_id) {
+                  return { ...d, member_count: Math.max((d.member_count ?? 1) - 1, 0) };
+                }
+                if (d.department_id === updated.department_id && previousDepartmentId !== updated.department_id) {
+                  return { ...d, member_count: (d.member_count ?? 0) + 1 };
+                }
+                return d;
+              });
+              return adjusted;
+            });
             setEditingUser(null);
           }} />
       )}

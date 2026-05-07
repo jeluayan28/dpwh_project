@@ -12,7 +12,6 @@ import {
   AlertTriangle,
   TrendingUp,
 } from "lucide-react";
-import { supabase } from "@/lib/supabase";
 
 const statusConfig: Record<
   string,
@@ -54,16 +53,20 @@ export default function DashboardPage() {
 
   useEffect(() => {
     async function fetchDocuments() {
-      const { data, error } = await supabase
-        .from("Documents")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(10);
+      try {
+        const response = await fetch("/api/documents", { cache: "no-store" });
+        const result = (await response.json()) as {
+          data?: Document[];
+          error?: string;
+        };
 
-      if (error) {
-        console.error("Error fetching documents:", error.message);
-      } else {
-        setDocuments(data ?? []);
+        if (!response.ok) {
+          throw new Error(result.error ?? "Unable to fetch documents.");
+        }
+
+        setDocuments((result.data ?? []).slice(0, 10));
+      } catch (error) {
+        console.error("Error fetching documents:", error);
       }
       setLoading(false);
     }
