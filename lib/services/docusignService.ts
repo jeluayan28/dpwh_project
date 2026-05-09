@@ -3,7 +3,9 @@
  * All DocuSign business logic.
  */
 
-import * as docusign from "docusign-esign";
+import type * as docusignTypes from "docusign-esign";
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const docusign = require("docusign-esign") as typeof import("docusign-esign");
 import { buildDocuSignClient, DOCUSIGN_ACCOUNT_ID } from "@/lib/docusign";
 
 // ---------------------------------------------------------------------------
@@ -58,14 +60,14 @@ export async function sendEnvelopeForSigning(
   const apiClient  = await buildDocuSignClient();
   const envelopesApi = new docusign.EnvelopesApi(apiClient);
 
-  const doc: docusign.Document = {
+  const doc: docusignTypes.Document = {
     documentBase64: fileBase64,
     name:           title,
     fileExtension:  "pdf",
     documentId:     "1",
   };
 
-  const dsSigners: docusign.Signer[] = signers.map((signer, index) => ({
+  const dsSigners: docusignTypes.Signer[] = signers.map((signer, index) => ({
     email:       signer.email,
     name:        signer.name,
     recipientId: String(index + 1),
@@ -86,7 +88,7 @@ export async function sendEnvelopeForSigning(
     },
   }));
 
-  const envelope: docusign.EnvelopeDefinition = {
+  const envelope: docusignTypes.EnvelopeDefinition = {
     emailSubject: emailSubject ?? `Please sign: ${title} [Tracking #${trackingNum}]`,
     documents:    [doc],
     recipients:   { signers: dsSigners },
@@ -125,7 +127,7 @@ export async function getEnvelopeStatus(envelopeId: string): Promise<EnvelopeSta
     completedDateTime: envelope.completedDateTime,
     declinedDateTime:  envelope.declinedDateTime,
     voidedDateTime:    envelope.voidedDateTime,
-    signers: (recipients.signers ?? []).map((s) => ({
+    signers: (recipients.signers ?? []).map((s: docusignTypes.Signer) => ({
       name:            s.name  ?? "",
       email:           s.email ?? "",
       status:          s.status ?? "unknown",

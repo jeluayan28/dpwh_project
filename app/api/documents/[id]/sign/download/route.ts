@@ -16,9 +16,10 @@ const supabase = createClient(
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const documentId = Number(params.id);
+  const { id } = await params;
+  const documentId = Number(id);
 
   const { data: doc, error } = await supabase
     .from("Documents")

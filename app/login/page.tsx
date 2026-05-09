@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 
-export function LoginForm({
+function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {

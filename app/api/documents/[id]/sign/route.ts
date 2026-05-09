@@ -43,9 +43,10 @@ async function fetchFileAsBase64(fileUrl: string): Promise<string> {
 // ---------------------------------------------------------------------------
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const documentId = Number(params.id);
+  const { id } = await params;
+  const documentId = Number(id);
   if (!documentId) {
     return NextResponse.json({ error: "Invalid document ID" }, { status: 400 });
   }
@@ -129,9 +130,10 @@ export async function POST(
 // ---------------------------------------------------------------------------
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const documentId = Number(params.id);
+  const { id } = await params;
+  const documentId = Number(id);
   const doc = await fetchDocument(documentId);
 
   if (!doc) {
@@ -155,9 +157,10 @@ export async function GET(
 // ---------------------------------------------------------------------------
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const documentId = Number(params.id);
+  const { id } = await params;
+  const documentId = Number(id);
   const doc = await fetchDocument(documentId);
 
   if (!doc) {

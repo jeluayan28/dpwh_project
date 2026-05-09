@@ -1,9 +1,13 @@
 /**
  * lib/docusign.ts
  * DocuSign API client factory with JWT token caching.
+ *
+ * Uses require() instead of import so Turbopack (Next.js 15+) doesn't
+ * statically bundle the AMD-based docusign-esign package.
  */
 
-import * as docusign from "docusign-esign";
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const docusign = require("docusign-esign") as typeof import("docusign-esign");
 
 const DS_INTEGRATION_KEY = process.env.DOCUSIGN_INTEGRATION_KEY!;
 const DS_USER_ID         = process.env.DOCUSIGN_USER_ID!;
@@ -39,7 +43,7 @@ export async function getDocuSignToken(): Promise<string> {
   return _cachedToken!;
 }
 
-export async function buildDocuSignClient(): Promise<docusign.ApiClient> {
+export async function buildDocuSignClient(): Promise<import("docusign-esign").ApiClient> {
   const token = await getDocuSignToken();
   const client = new docusign.ApiClient();
   client.setBasePath(DS_BASE_PATH);
