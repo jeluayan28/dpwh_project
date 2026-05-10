@@ -156,3 +156,80 @@ body {
     @apply font-sans;
   }
 }
+
+/* ── Dark mode: override Tailwind hover utilities that use hardcoded light colors ── */
+.dark .hover\:bg-gray-50:hover,
+.dark .hover\:bg-slate-50\/80:hover {
+  background-color: rgba(255,255,255,0.04) !important;
+}
+.dark .hover\:bg-gray-100:hover {
+  background-color: rgba(255,255,255,0.07) !important;
+}
+
+/* ── App-wide design tokens (light) ── */
+:root {
+  --dp-page-bg:      #F7F7F7;
+  --dp-card-bg:      #ffffff;
+  --dp-card-border:  #E5E7EB;
+  --dp-row-hover:    rgba(248,250,252,0.8);
+  --dp-header-bg:    #FAFAFA;
+  --dp-divider:      #F3F4F6;
+
+  --dp-text-1:       #1E1E2E;
+  --dp-text-2:       #374151;
+  --dp-text-3:       #6B7280;
+  --dp-text-4:       #9CA3AF;
+
+  --dp-input-bg:     #ffffff;
+  --dp-input-border: #E5E7EB;
+  --dp-input-text:   #111827;
+
+  --dp-info-bg:      #F9FAFB;
+  --dp-info-border:  #F3F4F6;
+
+  --dp-modal-bg:     #ffffff;
+  --dp-modal-border: #E5E7EB;
+  --dp-backdrop:     rgba(0,0,0,0.45);
+
+  --dp-primary:      #3338A0;
+  --dp-primary-lt:   #4F54C4;
+  --dp-primary-bg:   #EEF0FB;
+  --dp-primary-bd:   #D4D6F0;
+
+  --dp-close-btn:    #6B7280;
+  --dp-close-hover:  #F3F4F6;
+}
+
+/* ── App-wide design tokens (dark) ── */
+.dark {
+  --dp-page-bg:      #0f1117;
+  --dp-card-bg:      #1a1d27;
+  --dp-card-border:  #2a2d3e;
+  --dp-row-hover:    rgba(255,255,255,0.03);
+  --dp-header-bg:    #15182200;
+  --dp-divider:      #2a2d3e;
+
+  --dp-text-1:       #f0f1f8;
+  --dp-text-2:       #c9cde0;
+  --dp-text-3:       #8b90a8;
+  --dp-text-4:       #5c6078;
+
+  --dp-input-bg:     #1e2130;
+  --dp-input-border: #2e3148;
+  --dp-input-text:   #e8eaf6;
+
+  --dp-info-bg:      #1e2130;
+  --dp-info-border:  #2a2d3e;
+
+  --dp-modal-bg:     #1a1d27;
+  --dp-modal-border: #2a2d3e;
+  --dp-backdrop:     rgba(0,0,0,0.7);
+
+  --dp-primary:      #5b61d6;
+  --dp-primary-lt:   #7479e0;
+  --dp-primary-bg:   #1e2140;
+  --dp-primary-bd:   #2d3260;
+
+  --dp-close-btn:    #8b90a8;
+  --dp-close-hover:  #2a2d3e;
+}

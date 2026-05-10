@@ -66,12 +66,12 @@ async function requireData<T>(response: Response, fallback: string) {
 }
 
 const inputCls = "w-full rounded-xl border px-3 py-2 text-sm outline-none transition-shadow focus:ring-2 focus:ring-blue-200";
-const inputStyle = { borderColor: "#E5E7EB", backgroundColor: "#fff", color: "#111827" };
+const inputStyle = { borderColor: "var(--dp-input-border)", backgroundColor: "var(--dp-input-bg)", color: "var(--dp-input-text)" };
 
 function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
   return (
     <div className="space-y-1.5">
-      <label className="text-xs font-semibold" style={{ color: "#374151" }}>
+      <label className="text-xs font-semibold" style={{ color: "var(--dp-text-2)" }}>
         {label} {required && <span style={{ color: "#DC2626" }}>*</span>}
       </label>
       {children}
@@ -102,12 +102,12 @@ function Modal({ title, subtitle, icon, onClose, children }: {
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ backgroundColor: "rgba(0,0,0,0.45)", backdropFilter: "blur(4px)" }}
+      style={{ backgroundColor: "var(--dp-backdrop)", backdropFilter: "blur(4px)" }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <style>{`@keyframes modalIn { from { opacity:0; transform:translateY(12px) scale(0.97); } to { opacity:1; transform:translateY(0) scale(1); } }`}</style>
-      <div className="w-full max-w-md rounded-2xl overflow-hidden shadow-2xl" style={{ backgroundColor: "#fff", animation: "modalIn 0.2s cubic-bezier(0.34,1.56,0.64,1)" }}>
-        <div className="flex items-center justify-between px-6 py-5" style={{ background: "linear-gradient(135deg,#3338A0 0%,#4F54C4 100%)" }}>
+      <div className="w-full max-w-md rounded-2xl overflow-hidden shadow-2xl" style={{ backgroundColor: "var(--dp-card-bg)", animation: "modalIn 0.2s cubic-bezier(0.34,1.56,0.64,1)" }}>
+        <div className="flex items-center justify-between px-6 py-5" style={{ background: "linear-gradient(135deg,var(--dp-primary) 0%,var(--dp-primary-lt) 100%)" }}>
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl" style={{ backgroundColor: "rgba(255,255,255,0.15)" }}>
               {icon}
@@ -168,8 +168,8 @@ function AddDepartmentModal({ onClose, onAdded }: {
           <textarea rows={3} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Brief description…" className={`${inputCls} resize-none`} style={inputStyle} />
         </Field>
         <div className="flex gap-2 pt-1">
-          <button type="button" onClick={onClose} className="flex-1 rounded-xl border py-2.5 text-sm font-semibold transition-colors hover:bg-gray-50" style={{ borderColor: "#E5E7EB", color: "#6B7280" }}>Cancel</button>
-          <button type="submit" disabled={saving} className="flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold transition-all hover:opacity-90 disabled:opacity-60" style={{ backgroundColor: "#3338A0", color: "#fff" }}>
+          <button type="button" onClick={onClose} className="flex-1 rounded-xl border py-2.5 text-sm font-semibold transition-colors hover:bg-gray-50" style={{ borderColor: "var(--dp-card-border)", color: "var(--dp-text-3)" }}>Cancel</button>
+          <button type="submit" disabled={saving} className="flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold transition-all hover:opacity-90 disabled:opacity-60" style={{ backgroundColor: "var(--dp-primary)", color: "#fff" }}>
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Building2 className="h-4 w-4" />}
             {saving ? "Saving…" : "Add Department"}
           </button>
@@ -238,16 +238,16 @@ function AddUserModal({ roles, departments, onClose, onAdded }: {
             </select>
           </Field>
         </div>
-        <div className="flex items-center justify-between rounded-xl border px-4 py-3" style={{ borderColor: "#E5E7EB", backgroundColor: "#F9FAFB" }}>
+        <div className="flex items-center justify-between rounded-xl border px-4 py-3" style={{ borderColor: "var(--dp-card-border)", backgroundColor: "var(--dp-info-bg)" }}>
           <div>
-            <p className="text-xs font-semibold" style={{ color: "#374151" }}>Account Status</p>
-            <p className="text-xs" style={{ color: "#9CA3AF" }}>{status ? "User can log in" : "User cannot log in"}</p>
+            <p className="text-xs font-semibold" style={{ color: "var(--dp-text-2)" }}>Account Status</p>
+            <p className="text-xs" style={{ color: "var(--dp-text-4)" }}>{status ? "User can log in" : "User cannot log in"}</p>
           </div>
           <Toggle checked={status} onChange={() => setStatus((s) => !s)} />
         </div>
         <div className="flex gap-2 pt-1">
-          <button type="button" onClick={onClose} className="flex-1 rounded-xl border py-2.5 text-sm font-semibold transition-colors hover:bg-gray-50" style={{ borderColor: "#E5E7EB", color: "#6B7280" }}>Cancel</button>
-          <button type="submit" disabled={saving} className="flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold transition-all hover:opacity-90 disabled:opacity-60" style={{ backgroundColor: "#3338A0", color: "#fff" }}>
+          <button type="button" onClick={onClose} className="flex-1 rounded-xl border py-2.5 text-sm font-semibold transition-colors hover:bg-gray-50" style={{ borderColor: "var(--dp-card-border)", color: "var(--dp-text-3)" }}>Cancel</button>
+          <button type="submit" disabled={saving} className="flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold transition-all hover:opacity-90 disabled:opacity-60" style={{ backgroundColor: "var(--dp-primary)", color: "#fff" }}>
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
             {saving ? "Saving…" : "Add User"}
           </button>
@@ -318,16 +318,16 @@ function EditUserModal({ user, roles, departments, onClose, onUpdated }: {
             </select>
           </Field>
         </div>
-        <div className="flex items-center justify-between rounded-xl border px-4 py-3" style={{ borderColor: "#E5E7EB", backgroundColor: "#F9FAFB" }}>
+        <div className="flex items-center justify-between rounded-xl border px-4 py-3" style={{ borderColor: "var(--dp-card-border)", backgroundColor: "var(--dp-info-bg)" }}>
           <div>
-            <p className="text-xs font-semibold" style={{ color: "#374151" }}>Account Status</p>
-            <p className="text-xs" style={{ color: "#9CA3AF" }}>{status ? "User can log in" : "User cannot log in"}</p>
+            <p className="text-xs font-semibold" style={{ color: "var(--dp-text-2)" }}>Account Status</p>
+            <p className="text-xs" style={{ color: "var(--dp-text-4)" }}>{status ? "User can log in" : "User cannot log in"}</p>
           </div>
           <Toggle checked={status} onChange={() => setStatus((s) => !s)} />
         </div>
         <div className="flex gap-2 pt-1">
-          <button type="button" onClick={onClose} className="flex-1 rounded-xl border py-2.5 text-sm font-semibold transition-colors hover:bg-gray-50" style={{ borderColor: "#E5E7EB", color: "#6B7280" }}>Cancel</button>
-          <button type="submit" disabled={saving} className="flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold transition-all hover:opacity-90 disabled:opacity-60" style={{ backgroundColor: "#3338A0", color: "#fff" }}>
+          <button type="button" onClick={onClose} className="flex-1 rounded-xl border py-2.5 text-sm font-semibold transition-colors hover:bg-gray-50" style={{ borderColor: "var(--dp-card-border)", color: "var(--dp-text-3)" }}>Cancel</button>
+          <button type="submit" disabled={saving} className="flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold transition-all hover:opacity-90 disabled:opacity-60" style={{ backgroundColor: "var(--dp-primary)", color: "#fff" }}>
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Pencil className="h-4 w-4" />}
             {saving ? "Saving…" : "Save Changes"}
           </button>
@@ -377,8 +377,8 @@ function EditDepartmentModal({ dept, onClose, onUpdated }: {
           <textarea rows={3} value={description} onChange={(e) => setDescription(e.target.value)} className={`${inputCls} resize-none`} style={inputStyle} />
         </Field>
         <div className="flex gap-2 pt-1">
-          <button type="button" onClick={onClose} className="flex-1 rounded-xl border py-2.5 text-sm font-semibold transition-colors hover:bg-gray-50" style={{ borderColor: "#E5E7EB", color: "#6B7280" }}>Cancel</button>
-          <button type="submit" disabled={saving} className="flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold transition-all hover:opacity-90 disabled:opacity-60" style={{ backgroundColor: "#3338A0", color: "#fff" }}>
+          <button type="button" onClick={onClose} className="flex-1 rounded-xl border py-2.5 text-sm font-semibold transition-colors hover:bg-gray-50" style={{ borderColor: "var(--dp-card-border)", color: "var(--dp-text-3)" }}>Cancel</button>
+          <button type="submit" disabled={saving} className="flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold transition-all hover:opacity-90 disabled:opacity-60" style={{ backgroundColor: "var(--dp-primary)", color: "#fff" }}>
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Pencil className="h-4 w-4" />}
             {saving ? "Saving…" : "Save Changes"}
           </button>
@@ -395,24 +395,24 @@ function DeleteConfirmModal({ name, onClose, onConfirm, deleting }: {
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ backgroundColor: "rgba(0,0,0,0.45)", backdropFilter: "blur(4px)" }}
+      style={{ backgroundColor: "var(--dp-backdrop)", backdropFilter: "blur(4px)" }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <style>{`@keyframes modalIn { from { opacity:0; transform:translateY(12px) scale(0.97); } to { opacity:1; transform:translateY(0) scale(1); } }`}</style>
-      <div className="w-full max-w-sm rounded-2xl overflow-hidden shadow-2xl" style={{ backgroundColor: "#fff", animation: "modalIn 0.2s cubic-bezier(0.34,1.56,0.64,1)" }}>
+      <div className="w-full max-w-sm rounded-2xl overflow-hidden shadow-2xl" style={{ backgroundColor: "var(--dp-card-bg)", animation: "modalIn 0.2s cubic-bezier(0.34,1.56,0.64,1)" }}>
         <div className="px-6 pt-6 pb-5 text-center">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: "#FEF2F2" }}>
             <AlertTriangle className="h-6 w-6" style={{ color: "#DC2626" }} />
           </div>
-          <h2 className="text-base font-semibold" style={{ color: "#1E1E2E" }}>Confirm Removal</h2>
-          <p className="mt-1.5 text-sm" style={{ color: "#6B7280" }}>
+          <h2 className="text-base font-semibold" style={{ color: "var(--dp-text-1)" }}>Confirm Removal</h2>
+          <p className="mt-1.5 text-sm" style={{ color: "var(--dp-text-3)" }}>
             Are you sure you want to remove{" "}
-            <span className="font-semibold" style={{ color: "#111827" }}>{name}</span>?{" "}
+            <span className="font-semibold" style={{ color: "var(--dp-text-1)" }}>{name}</span>?{" "}
             This action cannot be undone.
           </p>
         </div>
         <div className="flex gap-2 px-6 pb-6">
-          <button onClick={onClose} className="flex-1 rounded-xl border py-2.5 text-sm font-semibold transition-colors hover:bg-gray-50" style={{ borderColor: "#E5E7EB", color: "#6B7280" }}>Cancel</button>
+          <button onClick={onClose} className="flex-1 rounded-xl border py-2.5 text-sm font-semibold transition-colors hover:bg-gray-50" style={{ borderColor: "var(--dp-card-border)", color: "var(--dp-text-3)" }}>Cancel</button>
           <button onClick={onConfirm} disabled={deleting} className="flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold transition-all hover:opacity-90 disabled:opacity-60" style={{ backgroundColor: "#DC2626", color: "#fff" }}>
             {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
             {deleting ? "Removing…" : "Remove"}
@@ -543,7 +543,7 @@ export default function RolesPage() {
   }
 
   return (
-    <main className="min-h-screen p-6 sm:p-8" style={{ backgroundColor: "#F7F7F7" }}>
+    <main className="min-h-screen p-6 sm:p-8" style={{ backgroundColor: "var(--dp-page-bg)" }}>
 
       {/* Modals */}
       {showAddUser && (
@@ -601,13 +601,13 @@ export default function RolesPage() {
       {/* Page Header */}
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight" style={{ color: "#1E1E2E" }}>User Management</h1>
-          <p className="mt-0.5 text-sm" style={{ color: "#6B7280" }}>Manage users, departments, and access roles</p>
+          <h1 className="text-2xl font-bold tracking-tight" style={{ color: "var(--dp-text-1)" }}>User Management</h1>
+          <p className="mt-0.5 text-sm" style={{ color: "var(--dp-text-3)" }}>Manage users, departments, and access roles</p>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="mb-6 flex items-center gap-0 border-b" style={{ borderColor: "#E5E7EB" }}>
+      <div className="mb-6 flex items-center gap-0 border-b" style={{ borderColor: "var(--dp-card-border)" }}>
         {tabs.map(({ id, label, icon: Icon }) => (
           <button key={id} onClick={() => setActiveTab(id)}
             className="flex items-center gap-2 px-5 py-3.5 text-sm font-semibold transition-all duration-200 relative"
@@ -624,19 +624,19 @@ export default function RolesPage() {
 
       {/* ── Users Tab ── */}
       {activeTab === "users" && (
-        <div className="rounded-2xl overflow-hidden" style={{ backgroundColor: "#fff", border: "1px solid #E5E7EB" }}>
+        <div className="rounded-2xl overflow-hidden" style={{ backgroundColor: "var(--dp-card-bg)", border: "1px solid var(--dp-card-border)" }}>
           {/* Header bar */}
-          <div className="flex items-center justify-between border-b px-6 py-4" style={{ borderColor: "#F3F4F6" }}>
+          <div className="flex items-center justify-between border-b px-6 py-4" style={{ borderColor: "var(--dp-divider)" }}>
             <div>
-              <h2 className="text-base font-semibold" style={{ color: "#1E1E2E" }}>Users</h2>
-              <p className="mt-0.5 text-xs" style={{ color: "#9CA3AF" }}>
+              <h2 className="text-base font-semibold" style={{ color: "var(--dp-text-1)" }}>Users</h2>
+              <p className="mt-0.5 text-xs" style={{ color: "var(--dp-text-4)" }}>
                 {loadingUsers ? "Loading…" : `${users.length} registered user${users.length !== 1 ? "s" : ""}`}
               </p>
             </div>
             <button
               onClick={() => setShowAddUser(true)}
               className="flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition-all hover:opacity-90 hover:-translate-y-px"
-              style={{ backgroundColor: "#3338A0", color: "#fff", boxShadow: "0 4px 14px rgba(51,56,160,0.28)" }}
+              style={{ backgroundColor: "var(--dp-primary)", color: "#fff", boxShadow: "0 4px 14px rgba(51,56,160,0.28)" }}
             >
               <Plus className="h-4 w-4" /> Add User
             </button>
@@ -645,7 +645,7 @@ export default function RolesPage() {
           {/* Column headers */}
           <div
             className="grid px-6 py-3 text-xs font-semibold uppercase tracking-wider"
-            style={{ gridTemplateColumns: "2fr 1.5fr 1.5fr 0.8fr 60px", backgroundColor: "#FAFAFA", color: "#9CA3AF", borderBottom: "1px solid #F3F4F6" }}
+            style={{ gridTemplateColumns: "2fr 1.5fr 1.5fr 0.8fr 60px", backgroundColor: "var(--dp-info-bg)", color: "var(--dp-text-4)", borderBottom: "1px solid var(--dp-divider)" }}
           >
             <span>Name</span>
             <span>Department</span>
@@ -656,21 +656,23 @@ export default function RolesPage() {
 
           {loadingUsers ? (
             <div className="flex items-center justify-center py-16">
-              <Loader2 className="h-6 w-6 animate-spin" style={{ color: "#3338A0" }} />
+              <Loader2 className="h-6 w-6 animate-spin" style={{ color: "var(--dp-primary)" }} />
             </div>
           ) : users.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-2 py-16">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: "#F3F4F6" }}>
-                <Users className="h-6 w-6" style={{ color: "#D1D5DB" }} />
+              <div className="flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: "var(--dp-info-bg)" }}>
+                <Users className="h-6 w-6" style={{ color: "var(--dp-text-4)" }} />
               </div>
-              <p className="text-sm" style={{ color: "#9CA3AF" }}>No users found.</p>
+              <p className="text-sm" style={{ color: "var(--dp-text-4)" }}>No users found.</p>
             </div>
           ) : (
             users.map((user, i) => (
               <div
                 key={user.user_id}
-                className="grid items-center px-6 py-3.5 transition-colors hover:bg-slate-50/80"
-                style={{ gridTemplateColumns: "2fr 1.5fr 1.5fr 0.8fr 60px", borderBottom: i < users.length - 1 ? "1px solid #F3F4F6" : "none" }}
+                className="grid items-center px-6 py-3.5 transition-colors"
+                style={{ gridTemplateColumns: "2fr 1.5fr 1.5fr 0.8fr 60px", borderBottom: i < users.length - 1 ? "1px solid var(--dp-divider)" : "none" }}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "var(--dp-row-hover)")}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
               >
                 {/* Name + avatar */}
                 <div className="flex items-center gap-3 min-w-0">
@@ -678,19 +680,19 @@ export default function RolesPage() {
                     {getInitials(user.name)}
                   </div>
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-medium" style={{ color: "#111827" }}>{user.name}</p>
-                    <p className="truncate text-xs" style={{ color: "#9CA3AF" }}>{user.email}</p>
+                    <p className="truncate text-sm font-medium" style={{ color: "var(--dp-text-1)" }}>{user.name}</p>
+                    <p className="truncate text-xs" style={{ color: "var(--dp-text-4)" }}>{user.email}</p>
                   </div>
                 </div>
 
-                <span className="truncate text-sm" style={{ color: "#6B7280" }}>{user.Departments?.department_name ?? "—"}</span>
-                <span className="truncate text-sm" style={{ color: "#6B7280" }}>{user.Roles?.role_name ?? "—"}</span>
+                <span className="truncate text-sm" style={{ color: "var(--dp-text-3)" }}>{user.Departments?.department_name ?? "—"}</span>
+                <span className="truncate text-sm" style={{ color: "var(--dp-text-3)" }}>{user.Roles?.role_name ?? "—"}</span>
 
                 {/* Status */}
                 <div className="flex justify-center">
                   <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap"
-                    style={{ backgroundColor: user.status ? "#F0FDF4" : "#F3F4F6", color: user.status ? "#15803D" : "#9CA3AF" }}>
-                    <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: user.status ? "#22C55E" : "#D1D5DB" }} />
+                    style={{ backgroundColor: user.status ? "#F0FDF4" : "var(--dp-info-bg)", color: user.status ? "#15803D" : "var(--dp-text-4)" }}>
+                    <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: user.status ? "#22C55E" : "var(--dp-text-4)" }} />
                     {user.status ? "Active" : "Inactive"}
                   </span>
                 </div>
@@ -700,18 +702,18 @@ export default function RolesPage() {
                   <button
                     onClick={() => setOpenMenu(openMenu === user.user_id ? null : user.user_id)}
                     className="rounded-lg p-1.5 transition-colors hover:bg-gray-100"
-                    style={{ color: "#9CA3AF" }}
+                    style={{ color: "var(--dp-text-4)" }}
                   >
                     <MoreVertical className="h-4 w-4" />
                   </button>
                   {openMenu === user.user_id && (
-                    <div className="absolute right-0 top-8 z-50 w-36 rounded-xl py-1 shadow-lg" style={{ backgroundColor: "#fff", border: "1px solid #E5E7EB" }}>
+                    <div className="absolute right-0 top-8 z-50 w-36 rounded-xl py-1 shadow-lg" style={{ backgroundColor: "var(--dp-card-bg)", border: "1px solid var(--dp-card-border)" }}>
                       <button
                         className="flex w-full items-center gap-2 px-3 py-2 text-xs font-medium transition-colors hover:bg-gray-50"
-                        style={{ color: "#374151" }}
+                        style={{ color: "var(--dp-text-2)" }}
                         onClick={() => { setEditingUser(user); setOpenMenu(null); }}
                       >
-                        <Pencil className="h-3.5 w-3.5" style={{ color: "#3338A0" }} /> Edit User
+                        <Pencil className="h-3.5 w-3.5" style={{ color: "var(--dp-primary)" }} /> Edit User
                       </button>
                       <button
                         className="flex w-full items-center gap-2 px-3 py-2 text-xs font-medium transition-colors hover:bg-gray-50"
@@ -731,19 +733,19 @@ export default function RolesPage() {
 
       {/* ── Departments Tab ── */}
       {activeTab === "departments" && (
-        <div className="rounded-2xl overflow-hidden" style={{ backgroundColor: "#fff", border: "1px solid #E5E7EB" }}>
+        <div className="rounded-2xl overflow-hidden" style={{ backgroundColor: "var(--dp-card-bg)", border: "1px solid var(--dp-card-border)" }}>
           {/* Header bar */}
-          <div className="flex items-center justify-between border-b px-6 py-4" style={{ borderColor: "#F3F4F6" }}>
+          <div className="flex items-center justify-between border-b px-6 py-4" style={{ borderColor: "var(--dp-divider)" }}>
             <div>
-              <h2 className="text-base font-semibold" style={{ color: "#1E1E2E" }}>Departments</h2>
-              <p className="mt-0.5 text-xs" style={{ color: "#9CA3AF" }}>
+              <h2 className="text-base font-semibold" style={{ color: "var(--dp-text-1)" }}>Departments</h2>
+              <p className="mt-0.5 text-xs" style={{ color: "var(--dp-text-4)" }}>
                 {loadingDepts ? "Loading…" : `${departments.length} division${departments.length !== 1 ? "s" : ""}`}
               </p>
             </div>
             <button
               onClick={() => setShowAddDept(true)}
               className="flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition-all hover:opacity-90 hover:-translate-y-px"
-              style={{ backgroundColor: "#3338A0", color: "#fff", boxShadow: "0 4px 14px rgba(51,56,160,0.28)" }}
+              style={{ backgroundColor: "var(--dp-primary)", color: "#fff", boxShadow: "0 4px 14px rgba(51,56,160,0.28)" }}
             >
               <Plus className="h-4 w-4" /> Add Department
             </button>
@@ -752,7 +754,7 @@ export default function RolesPage() {
           {/* Column headers */}
           <div
             className="grid px-6 py-3 text-xs font-semibold uppercase tracking-wider"
-            style={{ gridTemplateColumns: "2fr 3fr 0.8fr 60px", backgroundColor: "#FAFAFA", color: "#9CA3AF", borderBottom: "1px solid #F3F4F6" }}
+            style={{ gridTemplateColumns: "2fr 3fr 0.8fr 60px", backgroundColor: "var(--dp-info-bg)", color: "var(--dp-text-4)", borderBottom: "1px solid var(--dp-divider)" }}
           >
             <span>Department</span>
             <span>Description</span>
@@ -762,35 +764,37 @@ export default function RolesPage() {
 
           {loadingDepts ? (
             <div className="flex items-center justify-center py-16">
-              <Loader2 className="h-6 w-6 animate-spin" style={{ color: "#3338A0" }} />
+              <Loader2 className="h-6 w-6 animate-spin" style={{ color: "var(--dp-primary)" }} />
             </div>
           ) : departments.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-2 py-16">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: "#F3F4F6" }}>
-                <Building2 className="h-6 w-6" style={{ color: "#D1D5DB" }} />
+              <div className="flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: "var(--dp-info-bg)" }}>
+                <Building2 className="h-6 w-6" style={{ color: "var(--dp-text-4)" }} />
               </div>
-              <p className="text-sm" style={{ color: "#9CA3AF" }}>No departments found.</p>
+              <p className="text-sm" style={{ color: "var(--dp-text-4)" }}>No departments found.</p>
             </div>
           ) : (
             departments.map((dept, i) => (
               <div
                 key={dept.department_id}
-                className="grid items-center px-6 py-3.5 transition-colors hover:bg-slate-50/80"
-                style={{ gridTemplateColumns: "2fr 3fr 0.8fr 60px", borderBottom: i < departments.length - 1 ? "1px solid #F3F4F6" : "none" }}
+                className="grid items-center px-6 py-3.5 transition-colors"
+                style={{ gridTemplateColumns: "2fr 3fr 0.8fr 60px", borderBottom: i < departments.length - 1 ? "1px solid var(--dp-divider)" : "none" }}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "var(--dp-row-hover)")}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
               >
                 {/* Name + avatar */}
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-xs font-bold text-white" style={{ backgroundColor: getColor(dept.department_id) }}>
                     {getInitials(dept.department_name)}
                   </div>
-                  <span className="truncate text-sm font-medium" style={{ color: "#111827" }}>{dept.department_name}</span>
+                  <span className="truncate text-sm font-medium" style={{ color: "var(--dp-text-1)" }}>{dept.department_name}</span>
                 </div>
 
-                <span className="truncate text-sm pr-4" style={{ color: "#6B7280" }}>{dept.description ?? "—"}</span>
+                <span className="truncate text-sm pr-4" style={{ color: "var(--dp-text-3)" }}>{dept.description ?? "—"}</span>
 
                 {/* Member count */}
                 <div className="flex justify-end">
-                  <span className="rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap" style={{ backgroundColor: "#EEF0FB", color: "#3338A0" }}>
+                  <span className="rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap" style={{ backgroundColor: "var(--dp-primary-bg)", color: "var(--dp-primary)" }}>
                     {dept.member_count} members
                   </span>
                 </div>
@@ -800,18 +804,18 @@ export default function RolesPage() {
                   <button
                     onClick={() => setOpenMenu(openMenu === dept.department_id + 1000 ? null : dept.department_id + 1000)}
                     className="rounded-lg p-1.5 transition-colors hover:bg-gray-100"
-                    style={{ color: "#9CA3AF" }}
+                    style={{ color: "var(--dp-text-4)" }}
                   >
                     <MoreVertical className="h-4 w-4" />
                   </button>
                   {openMenu === dept.department_id + 1000 && (
-                    <div className="absolute right-0 top-8 z-20 w-40 rounded-xl py-1 shadow-lg" style={{ backgroundColor: "#fff", border: "1px solid #E5E7EB" }}>
+                    <div className="absolute right-0 top-8 z-20 w-40 rounded-xl py-1 shadow-lg" style={{ backgroundColor: "var(--dp-card-bg)", border: "1px solid var(--dp-card-border)" }}>
                       <button
                         className="flex w-full items-center gap-2 px-3 py-2 text-xs font-medium transition-colors hover:bg-gray-50"
-                        style={{ color: "#374151" }}
+                        style={{ color: "var(--dp-text-2)" }}
                         onClick={() => { setEditingDept(dept); setOpenMenu(null); }}
                       >
-                        <Pencil className="h-3.5 w-3.5" style={{ color: "#3338A0" }} /> Edit
+                        <Pencil className="h-3.5 w-3.5" style={{ color: "var(--dp-primary)" }} /> Edit
                       </button>
                       <button
                         className="flex w-full items-center gap-2 px-3 py-2 text-xs font-medium transition-colors hover:bg-gray-50"

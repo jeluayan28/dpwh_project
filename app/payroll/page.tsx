@@ -190,8 +190,8 @@ function CustomSelect({ label, value, onChange, options, placeholder }: {
   return (
     <div>
       <div className="mb-1.5 flex items-center">
-        <span className="inline-block w-0.5 h-3.5 rounded-full mr-2 shrink-0" style={{ backgroundColor: "#3338A0" }} />
-        <label className="text-xs font-semibold" style={{ color: "#374151" }}>{label}</label>
+        <span className="inline-block w-0.5 h-3.5 rounded-full mr-2 shrink-0" style={{ backgroundColor: "var(--dp-primary)" }} />
+        <label className="text-xs font-semibold" style={{ color: "var(--dp-text-2)" }}>{label}</label>
       </div>
       <div className="relative" ref={ref}>
         <button
@@ -214,7 +214,7 @@ function CustomSelect({ label, value, onChange, options, placeholder }: {
         {open && (
           <div
             className="absolute left-0 right-0 top-full z-[100] mt-1 rounded-xl overflow-hidden"
-            style={{ backgroundColor: "#fff", border: "1px solid #E5E7EB", boxShadow: "0 8px 24px rgba(0,0,0,0.10)", maxHeight: "220px", overflowY: "auto" }}
+            style={{ backgroundColor: "var(--dp-card-bg)", border: "1px solid var(--dp-card-border)", boxShadow: "0 8px 24px rgba(0,0,0,0.10)", maxHeight: "220px", overflowY: "auto" }}
           >
             {options.map((o, i) => {
               const isSelected = o.value === value;
@@ -225,17 +225,17 @@ function CustomSelect({ label, value, onChange, options, placeholder }: {
                   onMouseDown={(e) => { e.preventDefault(); onChange(o.value); setOpen(false); }}
                   className="w-full flex items-center justify-between px-3 py-2.5 text-sm text-left transition-colors"
                   style={{
-                    backgroundColor: isSelected ? "#EEF0FB" : "transparent",
-                    color: isSelected ? "#3338A0" : "#374151",
+                    backgroundColor: isSelected ? "var(--dp-primary-bg)" : "transparent",
+                    color: isSelected ? "var(--dp-primary)" : "var(--dp-text-2)",
                     fontWeight: isSelected ? 600 : 400,
-                    borderBottom: i < options.length - 1 ? "1px solid #F3F4F6" : "none",
+                    borderBottom: i < options.length - 1 ? "1px solid var(--dp-divider)" : "none",
                   }}
-                  onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.backgroundColor = "#F8F9FF"; }}
+                  onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.backgroundColor = "var(--dp-row-hover)"; }}
                   onMouseLeave={(e) => { if (!isSelected) e.currentTarget.style.backgroundColor = "transparent"; }}
                 >
                   <span>{o.label}</span>
                   {isSelected && (
-                    <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full" style={{ backgroundColor: "#3338A0" }}>
+                    <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full" style={{ backgroundColor: "var(--dp-primary)" }}>
                       <svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                     </span>
                   )}
@@ -261,7 +261,7 @@ function getFileType(url: string | null | undefined): { ext: string; badge: { bg
     doc:  { bg: "#EFF6FF", color: "#1D4ED8", border: "#BFDBFE" },
     docx: { bg: "#EEF2FF", color: "#4338CA", border: "#C7D2FE" },
   };
-  return { ext: ext.toUpperCase() || "FILE", badge: map[ext] ?? { bg: "#F3F4F6", color: "#6B7280", border: "#E5E7EB" } };
+  return { ext: ext.toUpperCase() || "FILE", badge: map[ext] ?? { bg: "var(--dp-info-bg)", color: "var(--dp-text-3)", border: "var(--dp-card-border)" } };
 }
 
 function formatDateTime(value: string | null | undefined) {
@@ -786,23 +786,23 @@ export default function DocumentsPage() {
   };
 
   const inputCls = "w-full rounded-xl border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-200 transition-shadow";
-  const inputStyle = { borderColor: "#E5E7EB", color: "#111827", backgroundColor: "#fff" };
+  const inputStyle = { borderColor: "var(--dp-input-border)", color: "var(--dp-input-text)", backgroundColor: "var(--dp-input-bg)" };
   const sectionCls = "rounded-2xl border p-5";
-  const sectionStyle = { borderColor: "#E5E7EB", backgroundColor: "#fff" };
+  const sectionStyle = { borderColor: "var(--dp-card-border)", backgroundColor: "var(--dp-card-bg)" };
 
   return (
-    <main className="min-h-screen p-6 sm:p-8" style={{ backgroundColor: "#F7F7F7" }}>
+    <main className="min-h-screen p-6 sm:p-8" style={{ backgroundColor: "var(--dp-page-bg)" }}>
 
       {/* ── Page header ── */}
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight" style={{ color: "#1E1E2E" }}>Documents</h1>
-          <p className="mt-0.5 text-sm" style={{ color: "#6B7280" }}>Complete list of all tracked documents</p>
+          <h1 className="text-2xl font-bold tracking-tight" style={{ color: "var(--dp-text-1)" }}>Documents</h1>
+          <p className="mt-0.5 text-sm" style={{ color: "var(--dp-text-3)" }}>Complete list of all tracked documents</p>
         </div>
         <button
           onClick={() => { setShowModal(true); setFormError(""); }}
           className="flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition-all hover:opacity-90 hover:-translate-y-px"
-          style={{ backgroundColor: "#3338A0", color: "#fff", boxShadow: "0 4px 14px rgba(51,56,160,0.28)" }}
+          style={{ backgroundColor: "var(--dp-primary)", color: "#fff", boxShadow: "0 4px 14px rgba(51,56,160,0.28)" }}
         >
           <Plus className="h-4 w-4" /> Add Document
         </button>
@@ -811,25 +811,25 @@ export default function DocumentsPage() {
       {/* ── Search + filters ── */}
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative w-full sm:max-w-sm">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" style={{ color: "#9CA3AF" }} />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" style={{ color: "var(--dp-text-4)" }} />
           <input
             type="text"
             placeholder="Search by title, tracking, or type..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full rounded-xl border py-2 pl-9 pr-4 text-sm outline-none focus:ring-2 focus:ring-blue-200"
-            style={{ borderColor: "#E5E7EB", backgroundColor: "#fff", color: "#111827" }}
+            style={{ borderColor: "var(--dp-card-border)", backgroundColor: "var(--dp-card-bg)", color: "var(--dp-text-1)" }}
           />
         </div>
         <div className="flex items-center gap-2">
-          <Filter className="h-4 w-4 shrink-0" style={{ color: "#9CA3AF" }} />
+          <Filter className="h-4 w-4 shrink-0" style={{ color: "var(--dp-text-4)" }} />
           <div className="flex flex-wrap gap-1.5">
             {STATUS_FILTERS.map((s) => (
               <button
                 key={s}
                 onClick={() => setStatusFilter(s)}
                 className="rounded-full px-3 py-1 text-xs font-semibold transition-all"
-                style={{ backgroundColor: statusFilter === s ? "#3338A0" : "#F3F4F6", color: statusFilter === s ? "#fff" : "#6B7280" }}
+                style={{ backgroundColor: statusFilter === s ? "var(--dp-primary)" : "var(--dp-info-bg)", color: statusFilter === s ? "#fff" : "var(--dp-text-3)" }}
               >
                 {s}
               </button>
@@ -839,24 +839,24 @@ export default function DocumentsPage() {
       </div>
 
       {/* ── Documents table ── */}
-      <div className="rounded-2xl overflow-hidden" style={{ backgroundColor: "#fff", border: "1px solid #E5E7EB" }}>
+      <div className="rounded-2xl overflow-hidden" style={{ backgroundColor: "var(--dp-card-bg)", border: "1px solid var(--dp-card-border)" }}>
         {/* Table bar */}
-        <div className="flex items-center justify-between border-b px-6 py-4" style={{ borderColor: "#F3F4F6" }}>
+        <div className="flex items-center justify-between border-b px-6 py-4" style={{ borderColor: "var(--dp-divider)" }}>
           <div>
-            <h2 className="text-base font-semibold" style={{ color: "#1E1E2E" }}>All Documents</h2>
-            <p className="mt-0.5 text-xs" style={{ color: "#9CA3AF" }}>
+            <h2 className="text-base font-semibold" style={{ color: "var(--dp-text-1)" }}>All Documents</h2>
+            <p className="mt-0.5 text-xs" style={{ color: "var(--dp-text-4)" }}>
               {loading ? "Loading…" : `${filtered.length} document${filtered.length !== 1 ? "s" : ""} found`}
             </p>
           </div>
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl" style={{ backgroundColor: "#EEF0FB" }}>
-            <FileText className="h-4 w-4" style={{ color: "#3338A0" }} />
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl" style={{ backgroundColor: "var(--dp-primary-bg)" }}>
+            <FileText className="h-4 w-4" style={{ color: "var(--dp-primary)" }} />
           </div>
         </div>
 
         {/* Column headers */}
         <div
           className="grid px-6 py-3 text-xs font-semibold uppercase tracking-wider"
-          style={{ gridTemplateColumns: "1fr 2fr 1fr 1fr 1fr 1fr 80px", backgroundColor: "#FAFAFA", color: "#9CA3AF", borderBottom: "1px solid #F3F4F6" }}
+          style={{ gridTemplateColumns: "1fr 2fr 1fr 1fr 1fr 1fr 80px", backgroundColor: "var(--dp-info-bg)", color: "var(--dp-text-4)", borderBottom: "1px solid var(--dp-divider)" }}
         >
           <span>Tracking #</span>
           <span>Title</span>
@@ -869,14 +869,14 @@ export default function DocumentsPage() {
 
         {loading ? (
           <div className="flex items-center justify-center py-16">
-            <Loader2 className="h-6 w-6 animate-spin" style={{ color: "#3338A0" }} />
+            <Loader2 className="h-6 w-6 animate-spin" style={{ color: "var(--dp-primary)" }} />
           </div>
         ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-2 py-16">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: "#F3F4F6" }}>
-              <FileText className="h-6 w-6" style={{ color: "#D1D5DB" }} />
+            <div className="flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: "var(--dp-info-bg)" }}>
+              <FileText className="h-6 w-6" style={{ color: "var(--dp-text-4)" }} />
             </div>
-            <p className="text-sm" style={{ color: "#9CA3AF" }}>No documents found.</p>
+            <p className="text-sm" style={{ color: "var(--dp-text-4)" }}>No documents found.</p>
           </div>
         ) : (
           filtered.map((doc, i) => {
@@ -885,11 +885,13 @@ export default function DocumentsPage() {
             return (
               <div
                 key={doc.document_id}
-                className="grid items-center px-6 py-3.5 transition-colors hover:bg-slate-50/80"
-                style={{ gridTemplateColumns: "1fr 2fr 1fr 1fr 1fr 1fr 80px", borderBottom: i < filtered.length - 1 ? "1px solid #F3F4F6" : "none" }}
+                className="grid items-center px-6 py-3.5 transition-colors"
+                style={{ gridTemplateColumns: "1fr 2fr 1fr 1fr 1fr 1fr 80px", borderBottom: i < filtered.length - 1 ? "1px solid var(--dp-divider)" : "none" }}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "var(--dp-row-hover)")}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
               >
                 {/* Tracking # */}
-                <span className="flex items-center gap-1.5 font-mono text-xs font-semibold" style={{ color: "#3338A0" }}>
+                <span className="flex items-center gap-1.5 font-mono text-xs font-semibold" style={{ color: "var(--dp-primary)" }}>
                   #{doc.tracking_num}
                   {doc.is_urgent && doc.status?.toLowerCase() !== "completed" && (
                     <span className="rounded-full px-1.5 py-0.5 text-xs font-bold" style={{ backgroundColor: "#FEF2F2", color: "#DC2626" }}>!</span>
@@ -898,14 +900,14 @@ export default function DocumentsPage() {
 
                 {/* Title */}
                 <div className="min-w-0 pr-4">
-                  <p className="truncate text-sm font-medium" style={{ color: "#111827" }}>{doc.title}</p>
+                  <p className="truncate text-sm font-medium" style={{ color: "var(--dp-text-1)" }}>{doc.title}</p>
                 </div>
 
                 {/* File */}
                 <div>
                   {(() => {
                     const ft = getFileType(doc.file_url);
-                    if (!ft) return <span className="text-xs" style={{ color: "#D1D5DB" }}>—</span>;
+                    if (!ft) return <span className="text-xs" style={{ color: "var(--dp-text-4)" }}>—</span>;
                     return (
                       <a
                         href={doc.file_url!} target="_blank" rel="noreferrer"
@@ -921,10 +923,10 @@ export default function DocumentsPage() {
                 </div>
 
                 {/* Type */}
-                <span className="text-xs" style={{ color: "#6B7280" }}>{doc.type ?? "—"}</span>
+                <span className="text-xs" style={{ color: "var(--dp-text-3)" }}>{doc.type ?? "—"}</span>
 
                 {/* Date */}
-                <span className="text-xs tabular-nums" style={{ color: "#6B7280" }}>
+                <span className="text-xs tabular-nums" style={{ color: "var(--dp-text-3)" }}>
                   {new Date(doc.created_at).toLocaleDateString("en-PH", { month: "short", day: "numeric", year: "numeric" })}
                 </span>
 
@@ -942,9 +944,9 @@ export default function DocumentsPage() {
                     type="button"
                     onClick={() => handleOpenDetails(doc.document_id)}
                     className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all duration-150 hover:-translate-y-px hover:shadow-md"
-                    style={{ backgroundColor: "#EEF0FB", color: "#3338A0", border: "1px solid #D4D6F0" }}
-                    onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#3338A0"; e.currentTarget.style.color = "#fff"; e.currentTarget.style.borderColor = "#3338A0"; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "#EEF0FB"; e.currentTarget.style.color = "#3338A0"; e.currentTarget.style.borderColor = "#D4D6F0"; }}
+                    style={{ backgroundColor: "var(--dp-primary-bg)", color: "var(--dp-primary)", border: "1px solid var(--dp-primary-bd)" }}
+                    onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "var(--dp-primary)"; e.currentTarget.style.color = "#fff"; e.currentTarget.style.borderColor = "var(--dp-primary)"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "var(--dp-primary-bg)"; e.currentTarget.style.color = "var(--dp-primary)"; e.currentTarget.style.borderColor = "var(--dp-primary-bd)"; }}
                   >
                     <Eye className="h-3.5 w-3.5" /> View
                   </button>
@@ -961,13 +963,13 @@ export default function DocumentsPage() {
       {showModal && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ backgroundColor: "rgba(0,0,0,0.45)", backdropFilter: "blur(4px)" }}
+          style={{ backgroundColor: "var(--dp-backdrop)", backdropFilter: "blur(4px)" }}
           onClick={(e) => { if (e.target === e.currentTarget) { setShowModal(false); setForm(EMPTY_FORM); } }}
         >
-          <div className="w-full max-w-md rounded-2xl overflow-hidden shadow-2xl" style={{ backgroundColor: "#fff", animation: "modalIn 0.2s cubic-bezier(0.34,1.56,0.64,1)" }}>
+          <div className="w-full max-w-md rounded-2xl overflow-hidden shadow-2xl" style={{ backgroundColor: "var(--dp-card-bg)", animation: "modalIn 0.2s cubic-bezier(0.34,1.56,0.64,1)" }}>
             <style>{`@keyframes modalIn { from { opacity:0; transform:translateY(12px) scale(0.97); } to { opacity:1; transform:translateY(0) scale(1); } }`}</style>
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-5" style={{ background: "linear-gradient(135deg,#3338A0 0%,#4F54C4 100%)" }}>
+            <div className="flex items-center justify-between px-6 py-5" style={{ background: "linear-gradient(135deg,var(--dp-primary) 0%,var(--dp-primary-lt) 100%)" }}>
               <div className="flex items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl" style={{ backgroundColor: "rgba(255,255,255,0.15)" }}>
                   <Plus className="h-4 w-4 text-white" />
@@ -985,12 +987,12 @@ export default function DocumentsPage() {
             {/* Body */}
             <form onSubmit={handleAddDocument} className="flex flex-col gap-4 p-6">
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold" style={{ color: "#374151" }}>Title <span style={{ color: "#DC2626" }}>*</span></label>
+                <label className="text-xs font-semibold" style={{ color: "var(--dp-text-2)" }}>Title <span style={{ color: "#DC2626" }}>*</span></label>
                 <input type="text" placeholder="e.g. Budget Request Q2" value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} className={inputCls} style={inputStyle} />
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold" style={{ color: "#374151" }}>Type <span style={{ color: "#DC2626" }}>*</span></label>
+                <label className="text-xs font-semibold" style={{ color: "var(--dp-text-2)" }}>Type <span style={{ color: "#DC2626" }}>*</span></label>
                 <select value={form.type} onChange={(e) => setForm((f) => ({ ...f, type: e.target.value }))} className={inputCls} style={{ ...inputStyle, color: form.type ? "#111827" : "#9CA3AF" }}>
                   <option value="" disabled>Select type…</option>
                   {DOCUMENT_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
@@ -998,22 +1000,22 @@ export default function DocumentsPage() {
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold" style={{ color: "#374151" }}>
-                  Attach File <span className="font-normal" style={{ color: "#9CA3AF" }}>(PDF or Word, max 10MB)</span>
+                <label className="text-xs font-semibold" style={{ color: "var(--dp-text-2)" }}>
+                  Attach File <span className="font-normal" style={{ color: "var(--dp-text-4)" }}>(PDF or Word, max 10MB)</span>
                 </label>
-                <label className="flex cursor-pointer items-center gap-3 rounded-xl border-2 border-dashed px-4 py-3 transition-colors hover:bg-gray-50" style={{ borderColor: form.file ? "#3338A0" : "#E5E7EB" }}>
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg" style={{ backgroundColor: form.file ? "#EEF0FB" : "#F9FAFB" }}>
-                    {form.file ? <Paperclip className="h-4 w-4" style={{ color: "#3338A0" }} /> : <Upload className="h-4 w-4" style={{ color: "#9CA3AF" }} />}
+                <label className="flex cursor-pointer items-center gap-3 rounded-xl border-2 border-dashed px-4 py-3 transition-colors hover:opacity-80" style={{ borderColor: form.file ? "var(--dp-primary)" : "var(--dp-card-border)" }}>
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg" style={{ backgroundColor: form.file ? "var(--dp-primary-bg)" : "var(--dp-info-bg)" }}>
+                    {form.file ? <Paperclip className="h-4 w-4" style={{ color: "var(--dp-primary)" }} /> : <Upload className="h-4 w-4" style={{ color: "var(--dp-text-4)" }} />}
                   </div>
                   <div className="min-w-0 flex-1">
                     {form.file ? (
-                      <><p className="truncate text-xs font-semibold" style={{ color: "#3338A0" }}>{form.file.name}</p><p className="text-xs" style={{ color: "#9CA3AF" }}>{(form.file.size / 1024).toFixed(1)} KB</p></>
+                      <><p className="truncate text-xs font-semibold" style={{ color: "var(--dp-primary)" }}>{form.file.name}</p><p className="text-xs" style={{ color: "var(--dp-text-4)" }}>{(form.file.size / 1024).toFixed(1)} KB</p></>
                     ) : (
-                      <p className="text-xs" style={{ color: "#9CA3AF" }}>Click to browse — .pdf, .doc, .docx</p>
+                      <p className="text-xs" style={{ color: "var(--dp-text-4)" }}>Click to browse — .pdf, .doc, .docx</p>
                     )}
                   </div>
                   {form.file && (
-                    <button type="button" onClick={(e) => { e.preventDefault(); setForm((f) => ({ ...f, file: null })); }} className="shrink-0 rounded p-1 hover:bg-gray-100" style={{ color: "#9CA3AF" }}>
+                    <button type="button" onClick={(e) => { e.preventDefault(); setForm((f) => ({ ...f, file: null })); }} className="shrink-0 rounded p-1 hover:bg-gray-100" style={{ color: "var(--dp-text-4)" }}>
                       <X className="h-3.5 w-3.5" />
                     </button>
                   )}
@@ -1031,8 +1033,8 @@ export default function DocumentsPage() {
               {formError && <p className="rounded-xl px-3 py-2 text-xs font-medium" style={{ backgroundColor: "#FEF2F2", color: "#DC2626" }}>{formError}</p>}
 
               <div className="mt-1 flex gap-2">
-                <button type="button" onClick={() => { setShowModal(false); setForm(EMPTY_FORM); }} className="flex-1 rounded-xl border py-2.5 text-sm font-semibold transition-colors hover:bg-gray-50" style={{ borderColor: "#E5E7EB", color: "#6B7280" }}>Cancel</button>
-                <button type="submit" disabled={submitting} className="flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold transition-all hover:opacity-90 disabled:opacity-60" style={{ backgroundColor: "#3338A0", color: "#fff" }}>
+                <button type="button" onClick={() => { setShowModal(false); setForm(EMPTY_FORM); }} className="flex-1 rounded-xl border py-2.5 text-sm font-semibold transition-colors hover:bg-gray-50" style={{ borderColor: "var(--dp-card-border)", color: "var(--dp-text-3)" }}>Cancel</button>
+                <button type="submit" disabled={submitting} className="flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold transition-all hover:opacity-90 disabled:opacity-60" style={{ backgroundColor: "var(--dp-primary)", color: "#fff" }}>
                   {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
                   {submitting ? "Saving…" : "Add Document"}
                 </button>
@@ -1048,13 +1050,13 @@ export default function DocumentsPage() {
       {selectedDocumentId && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ backgroundColor: "rgba(0,0,0,0.45)", backdropFilter: "blur(4px)" }}
+          style={{ backgroundColor: "var(--dp-backdrop)", backdropFilter: "blur(4px)" }}
           onClick={(e) => { if (e.target === e.currentTarget) closeDetails(); }}
         >
-          <div className="max-h-[90vh] w-full max-w-5xl overflow-y-auto rounded-2xl shadow-2xl" style={{ backgroundColor: "#F7F7F7", animation: "modalIn 0.2s cubic-bezier(0.34,1.56,0.64,1)" }}>
+          <div className="max-h-[90vh] w-full max-w-5xl overflow-y-auto rounded-2xl shadow-2xl" style={{ backgroundColor: "var(--dp-card-bg)", border: "1px solid var(--dp-card-border)", animation: "modalIn 0.2s cubic-bezier(0.34,1.56,0.64,1)" }}>
 
             {/* Modal header */}
-            <div className="flex items-center justify-between px-6 py-5 rounded-t-2xl" style={{ background: "linear-gradient(135deg,#3338A0 0%,#4F54C4 100%)" }}>
+            <div className="flex items-center justify-between px-6 py-5 rounded-t-2xl" style={{ background: "linear-gradient(135deg,var(--dp-primary) 0%,var(--dp-primary-lt) 100%)" }}>
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl" style={{ backgroundColor: "rgba(255,255,255,0.15)" }}>
                   <FileText className="h-5 w-5 text-white" />
@@ -1073,7 +1075,7 @@ export default function DocumentsPage() {
 
             {detailsLoading ? (
               <div className="flex items-center justify-center py-24">
-                <Loader2 className="h-7 w-7 animate-spin" style={{ color: "#3338A0" }} />
+                <Loader2 className="h-7 w-7 animate-spin" style={{ color: "var(--dp-primary)" }} />
               </div>
             ) : detailsError && !selectedChain ? (
               <div className="m-6 rounded-xl px-4 py-3 text-sm" style={{ backgroundColor: "#FEF2F2", color: "#DC2626" }}>{detailsError}</div>
@@ -1089,15 +1091,15 @@ export default function DocumentsPage() {
                     { label: "Attachment", value: null, fileUrl: selectedChain.document.file_url },
                   ].map(({ label, value, mono, capitalize, fileUrl }) => (
                     <div key={label} className={sectionCls} style={sectionStyle}>
-                      <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#9CA3AF" }}>{label}</p>
+                      <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--dp-text-4)" }}>{label}</p>
                       {fileUrl ? (
-                        <a href={fileUrl} target="_blank" rel="noreferrer" className="mt-2 inline-flex items-center gap-1 text-sm font-semibold hover:underline" style={{ color: "#3338A0" }}>
+                        <a href={fileUrl} target="_blank" rel="noreferrer" className="mt-2 inline-flex items-center gap-1 text-sm font-semibold hover:underline" style={{ color: "var(--dp-primary)" }}>
                           Open file <ArrowUpRight className="h-3.5 w-3.5" />
                         </a>
                       ) : fileUrl === null && label === "Attachment" ? (
-                        <p className="mt-2 text-sm" style={{ color: "#9CA3AF" }}>No file uploaded</p>
+                        <p className="mt-2 text-sm" style={{ color: "var(--dp-text-4)" }}>No file uploaded</p>
                       ) : (
-                        <p className={`mt-2 text-sm font-bold ${capitalize ? "capitalize" : ""} ${mono ? "font-mono" : ""}`} style={{ color: "#111827" }}>{value}</p>
+                        <p className={`mt-2 text-sm font-bold ${capitalize ? "capitalize" : ""} ${mono ? "font-mono" : ""}`} style={{ color: "var(--dp-text-1)" }}>{value}</p>
                       )}
                     </div>
                   ))}
@@ -1108,11 +1110,11 @@ export default function DocumentsPage() {
                 {/* ── Visual Tracker ── */}
                 <div className={sectionCls} style={sectionStyle}>
                   <div className="mb-4">
-                    <h3 className="text-sm font-semibold" style={{ color: "#1E1E2E" }}>Visual Tracker</h3>
-                    <p className="text-xs" style={{ color: "#9CA3AF" }}>Progress view for this document</p>
+                    <h3 className="text-sm font-semibold" style={{ color: "var(--dp-text-1)" }}>Visual Tracker</h3>
+                    <p className="text-xs" style={{ color: "var(--dp-text-4)" }}>Progress view for this document</p>
                   </div>
                   {trackerSteps.length === 0 ? (
-                    <p className="text-sm" style={{ color: "#9CA3AF" }}>No tracker steps yet.</p>
+                    <p className="text-sm" style={{ color: "var(--dp-text-4)" }}>No tracker steps yet.</p>
                   ) : (
                     <div className="overflow-x-auto pb-2">
                       <div className="flex min-w-max items-start px-2 pt-3">
@@ -1123,16 +1125,16 @@ export default function DocumentsPage() {
                             <div key={step.id} className="flex items-start">
                               <div className="flex w-36 flex-col items-center text-center">
                                 <div
-                                  className="flex h-12 w-12 items-center justify-center rounded-full border-4 bg-white"
-                                  style={{ borderColor: isActive ? "#22C55E" : "#E5E7EB", color: isActive ? "#22C55E" : "#9CA3AF", boxShadow: step.state === "current" ? "0 0 0 6px rgba(34,197,94,0.12)" : "none" }}
+                                  className="flex h-12 w-12 items-center justify-center rounded-full border-4"
+                                  style={{ backgroundColor: "var(--dp-card-bg)", borderColor: isActive ? "#22C55E" : "var(--dp-card-border)", color: isActive ? "#22C55E" : "var(--dp-text-4)", boxShadow: step.state === "current" ? "0 0 0 6px rgba(34,197,94,0.12)" : "none" }}
                                 >
                                   {step.icon}
                                 </div>
-                                <p className="mt-3 text-xs font-semibold leading-tight capitalize" style={{ color: isActive ? "#111827" : "#9CA3AF" }}>{step.label}</p>
-                                <p className="mt-1 text-xs" style={{ color: "#9CA3AF" }}>{formatDateTime(step.timestamp)}</p>
+                                <p className="mt-3 text-xs font-semibold leading-tight capitalize" style={{ color: isActive ? "var(--dp-text-1)" : "var(--dp-text-4)" }}>{step.label}</p>
+                                <p className="mt-1 text-xs" style={{ color: "var(--dp-text-4)" }}>{formatDateTime(step.timestamp)}</p>
                               </div>
                               {index < trackerSteps.length - 1 && (
-                                <div className="mt-6 h-0.5 w-20 rounded-full" style={{ backgroundColor: connectorActive ? "#22C55E" : "#E5E7EB" }} />
+                                <div className="mt-6 h-0.5 w-20 rounded-full" style={{ backgroundColor: connectorActive ? "#22C55E" : "var(--dp-card-border)" }} />
                               )}
                             </div>
                           );
@@ -1143,9 +1145,9 @@ export default function DocumentsPage() {
                 </div>
 
                 {/* ── Tabbed bottom section ── */}
-                <div className="rounded-2xl overflow-hidden" style={{ backgroundColor: "#fff", border: "1px solid #E5E7EB" }}>
+                <div className="rounded-2xl overflow-hidden" style={{ backgroundColor: "var(--dp-card-bg)", border: "1px solid var(--dp-card-border)" }}>
                   {/* Tab bar */}
-                  <div className="flex items-center border-b px-6" style={{ borderColor: "#E5E7EB" }}>
+                  <div className="flex items-center border-b px-6" style={{ borderColor: "var(--dp-card-border)" }}>
                     {(["custody", "actions", "esign"] as const).map((tab) => {
                       const labels = { custody: "Chain of Custody", actions: "Actions", esign: "E-Signature" };
                       return (
@@ -1154,8 +1156,8 @@ export default function DocumentsPage() {
                           onClick={() => setDetailTab(tab)}
                           className="relative py-3.5 px-1 mr-6 text-sm font-semibold transition-colors duration-150"
                           style={{
-                            color: detailTab === tab ? "#3338A0" : "#9CA3AF",
-                            borderBottom: detailTab === tab ? "2px solid #3338A0" : "2px solid transparent",
+                            color: detailTab === tab ? "var(--dp-primary)" : "var(--dp-text-4)",
+                            borderBottom: detailTab === tab ? "2px solid var(--dp-primary)" : "2px solid transparent",
                             marginBottom: "-1px",
                             background: "transparent",
                           }}
@@ -1173,25 +1175,25 @@ export default function DocumentsPage() {
                       <div className="space-y-5">
                         <div>
                           <div className="mb-3">
-                            <h3 className="text-sm font-semibold" style={{ color: "#1E1E2E" }}>Chain of Custody</h3>
-                            <p className="text-xs" style={{ color: "#9CA3AF" }}>Full department movement history</p>
+                            <h3 className="text-sm font-semibold" style={{ color: "var(--dp-text-1)" }}>Chain of Custody</h3>
+                            <p className="text-xs" style={{ color: "var(--dp-text-4)" }}>Full department movement history</p>
                           </div>
                           {selectedChain.logs.length === 0 ? (
-                            <p className="text-sm" style={{ color: "#9CA3AF" }}>No movement logs yet.</p>
+                            <p className="text-sm" style={{ color: "var(--dp-text-4)" }}>No movement logs yet.</p>
                           ) : (
                             <div className="space-y-2">
                               {selectedChain.logs.map((log) => (
-                                <div key={log.log_id} className="rounded-xl p-3.5" style={{ backgroundColor: "#F9FAFB", border: "1px solid #F3F4F6" }}>
+                                <div key={log.log_id} className="rounded-xl p-3.5" style={{ backgroundColor: "var(--dp-info-bg)", border: "1px solid var(--dp-divider)" }}>
                                   <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-                                    <p className="text-xs font-semibold" style={{ color: "#111827" }}>
+                                    <p className="text-xs font-semibold" style={{ color: "var(--dp-text-1)" }}>
                                       {log.from_department_name ?? "Origin"} → {log.to_department_name ?? "Unassigned"}
                                     </p>
-                                    <span className="text-xs" style={{ color: "#9CA3AF" }}>{formatDateTime(log.date_received)}</span>
+                                    <span className="text-xs" style={{ color: "var(--dp-text-4)" }}>{formatDateTime(log.date_received)}</span>
                                   </div>
-                                  <div className="grid grid-cols-2 gap-1 text-xs" style={{ color: "#6B7280" }}>
-                                    <p>Released by: <span className="font-medium" style={{ color: "#374151" }}>{log.released_by_name ?? "—"}</span></p>
-                                    <p>Received by: <span className="font-medium" style={{ color: "#374151" }}>{log.received_by_name ?? "—"}</span></p>
-                                    {log.remarks && <p className="col-span-2">Remarks: <span className="font-medium" style={{ color: "#374151" }}>{log.remarks}</span></p>}
+                                  <div className="grid grid-cols-2 gap-1 text-xs" style={{ color: "var(--dp-text-3)" }}>
+                                    <p>Released by: <span className="font-medium" style={{ color: "var(--dp-text-2)" }}>{log.released_by_name ?? "—"}</span></p>
+                                    <p>Received by: <span className="font-medium" style={{ color: "var(--dp-text-2)" }}>{log.received_by_name ?? "—"}</span></p>
+                                    {log.remarks && <p className="col-span-2">Remarks: <span className="font-medium" style={{ color: "var(--dp-text-2)" }}>{log.remarks}</span></p>}
                                   </div>
                                 </div>
                               ))}
@@ -1199,13 +1201,13 @@ export default function DocumentsPage() {
                           )}
                         </div>
 
-                        <div style={{ borderTop: "1px solid #F3F4F6", paddingTop: "1.25rem" }}>
+                        <div style={{ borderTop: "1px solid var(--dp-divider)", paddingTop: "1.25rem" }}>
                           <div className="mb-3">
-                            <h3 className="text-sm font-semibold" style={{ color: "#1E1E2E" }}>Status History</h3>
-                            <p className="text-xs" style={{ color: "#9CA3AF" }}>Timeline of status updates</p>
+                            <h3 className="text-sm font-semibold" style={{ color: "var(--dp-text-1)" }}>Status History</h3>
+                            <p className="text-xs" style={{ color: "var(--dp-text-4)" }}>Timeline of status updates</p>
                           </div>
                           {selectedChain.status_history.length === 0 ? (
-                            <p className="text-sm" style={{ color: "#9CA3AF" }}>No status history yet.</p>
+                            <p className="text-sm" style={{ color: "var(--dp-text-4)" }}>No status history yet.</p>
                           ) : (
                             <div className="space-y-2">
                               {selectedChain.status_history.map((item) => {
@@ -1217,7 +1219,7 @@ export default function DocumentsPage() {
                                       <span className="h-2 w-2 rounded-full" style={{ backgroundColor: sc.dot }} />
                                       <span className="text-xs font-semibold capitalize" style={{ color: sc.color }}>{item.status.replaceAll("_", " ")}</span>
                                     </div>
-                                    <span className="text-xs tabular-nums" style={{ color: "#9CA3AF" }}>{formatDateTime(item.updated_at)}</span>
+                                    <span className="text-xs tabular-nums" style={{ color: "var(--dp-text-4)" }}>{formatDateTime(item.updated_at)}</span>
                                   </div>
                                 );
                               })}
@@ -1231,14 +1233,14 @@ export default function DocumentsPage() {
                     {detailTab === "actions" && (
                       <div className="grid gap-6 sm:grid-cols-2">
                         {/* Move Document */}
-                        <div className="rounded-2xl p-5 space-y-3" style={{ backgroundColor: "#FAFAFA", border: "1px solid #F3F4F6" }}>
-                          <div className="flex items-center gap-2.5 pb-3" style={{ borderBottom: "1px solid #F0F0F5" }}>
-                            <div className="flex h-7 w-7 items-center justify-center rounded-lg" style={{ backgroundColor: "#EEF0FB" }}>
-                              <ArrowUpRight className="h-3.5 w-3.5" style={{ color: "#3338A0" }} />
+                        <div className="rounded-2xl p-5 space-y-3" style={{ backgroundColor: "var(--dp-info-bg)", border: "1px solid var(--dp-divider)" }}>
+                          <div className="flex items-center gap-2.5 pb-3" style={{ borderBottom: "1px solid var(--dp-divider)" }}>
+                            <div className="flex h-7 w-7 items-center justify-center rounded-lg" style={{ backgroundColor: "var(--dp-primary-bg)" }}>
+                              <ArrowUpRight className="h-3.5 w-3.5" style={{ color: "var(--dp-primary)" }} />
                             </div>
                             <div>
-                              <h3 className="text-sm font-semibold" style={{ color: "#1E1E2E" }}>Move Document</h3>
-                              <p className="text-xs" style={{ color: "#9CA3AF" }}>Forward to another department</p>
+                              <h3 className="text-sm font-semibold" style={{ color: "var(--dp-text-1)" }}>Move Document</h3>
+                              <p className="text-xs" style={{ color: "var(--dp-text-4)" }}>Forward to another department</p>
                             </div>
                           </div>
                           <form onSubmit={handleCreateMovement} className="space-y-3">
@@ -1248,12 +1250,12 @@ export default function DocumentsPage() {
                             <CustomSelect label="Status After Move" value={movementForm.status} onChange={(v) => setMovementForm((p) => ({ ...p, status: v }))} options={DOCUMENT_STATUSES.map((s) => ({ value: s, label: s.replaceAll("_", " ") }))} />
                             <div>
                               <div className="mb-1.5 flex items-center">
-                                <span className="inline-block w-0.5 h-3.5 rounded-full mr-2 shrink-0" style={{ backgroundColor: "#3338A0" }} />
-                                <label className="text-xs font-semibold" style={{ color: "#374151" }}>Remarks</label>
+                                <span className="inline-block w-0.5 h-3.5 rounded-full mr-2 shrink-0" style={{ backgroundColor: "var(--dp-primary)" }} />
+                                <label className="text-xs font-semibold" style={{ color: "var(--dp-text-2)" }}>Remarks</label>
                               </div>
-                              <textarea rows={2} value={movementForm.remarks} onChange={(e) => setMovementForm((p) => ({ ...p, remarks: e.target.value }))} placeholder="Explain the handoff…" className="w-full rounded-xl border px-3 py-2.5 text-sm outline-none resize-none focus:ring-2 focus:ring-blue-200" style={{ borderColor: "#E5E7EB", backgroundColor: "#fff", color: "#111827" }} />
+                              <textarea rows={2} value={movementForm.remarks} onChange={(e) => setMovementForm((p) => ({ ...p, remarks: e.target.value }))} placeholder="Explain the handoff…" className="w-full rounded-xl border px-3 py-2.5 text-sm outline-none resize-none focus:ring-2 focus:ring-blue-200" style={{ borderColor: "var(--dp-card-border)", backgroundColor: "var(--dp-card-bg)", color: "var(--dp-text-1)" }} />
                             </div>
-                            <button type="submit" disabled={movementSubmitting} className="flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold transition-all hover:opacity-90 disabled:opacity-60" style={{ backgroundColor: "#3338A0", color: "#fff", boxShadow: "0 4px 14px rgba(51,56,160,0.22)" }}>
+                            <button type="submit" disabled={movementSubmitting} className="flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold transition-all hover:opacity-90 disabled:opacity-60" style={{ backgroundColor: "var(--dp-primary)", color: "#fff", boxShadow: "0 4px 14px rgba(51,56,160,0.22)" }}>
                               {movementSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
                               {movementSubmitting ? "Saving…" : "Save Movement"}
                             </button>
@@ -1261,19 +1263,19 @@ export default function DocumentsPage() {
                         </div>
 
                         {/* Change Status */}
-                        <div className="rounded-2xl p-5 space-y-3" style={{ backgroundColor: "#FAFAFA", border: "1px solid #F3F4F6" }}>
-                          <div className="flex items-center gap-2.5 pb-3" style={{ borderBottom: "1px solid #F0F0F5" }}>
+                        <div className="rounded-2xl p-5 space-y-3" style={{ backgroundColor: "var(--dp-info-bg)", border: "1px solid var(--dp-divider)" }}>
+                          <div className="flex items-center gap-2.5 pb-3" style={{ borderBottom: "1px solid var(--dp-divider)" }}>
                             <div className="flex h-7 w-7 items-center justify-center rounded-lg" style={{ backgroundColor: "#F0FDF4" }}>
                               <CheckCircle2 className="h-3.5 w-3.5" style={{ color: "#16A34A" }} />
                             </div>
                             <div>
-                              <h3 className="text-sm font-semibold" style={{ color: "#1E1E2E" }}>Change Status</h3>
-                              <p className="text-xs" style={{ color: "#9CA3AF" }}>Add a status entry for this document</p>
+                              <h3 className="text-sm font-semibold" style={{ color: "var(--dp-text-1)" }}>Change Status</h3>
+                              <p className="text-xs" style={{ color: "var(--dp-text-4)" }}>Add a status entry for this document</p>
                             </div>
                           </div>
                           <form onSubmit={handleCreateStatus} className="space-y-3">
                             <CustomSelect label="Status" value={statusForm.status} onChange={(v) => setStatusForm({ status: v })} options={DOCUMENT_STATUSES.map((s) => ({ value: s, label: s.replaceAll("_", " ") }))} />
-                            <button type="submit" disabled={statusSubmitting} className="flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold transition-all hover:opacity-90 disabled:opacity-60" style={{ backgroundColor: "#111827", color: "#fff" }}>
+                            <button type="submit" disabled={statusSubmitting} className="flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold transition-all hover:opacity-90 disabled:opacity-60" style={{ backgroundColor: "var(--dp-primary)", color: "#fff" }}>
                               {statusSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
                               {statusSubmitting ? "Saving…" : "Save Status"}
                             </button>
@@ -1286,34 +1288,34 @@ export default function DocumentsPage() {
                     {detailTab === "esign" && (
                       <div className="max-w-md">
                         <div className="mb-3">
-                          <h3 className="text-sm font-semibold" style={{ color: "#1E1E2E" }}>E-Signature (DocuSign)</h3>
-                          <p className="text-xs" style={{ color: "#9CA3AF" }}>Send this document for electronic signing</p>
+                          <h3 className="text-sm font-semibold" style={{ color: "var(--dp-text-1)" }}>E-Signature (DocuSign)</h3>
+                          <p className="text-xs" style={{ color: "var(--dp-text-4)" }}>Send this document for electronic signing</p>
                         </div>
                         {signingLoading ? (
                           <div className="flex items-center justify-center py-10">
-                            <Loader2 className="h-5 w-5 animate-spin" style={{ color: "#3338A0" }} />
+                            <Loader2 className="h-5 w-5 animate-spin" style={{ color: "var(--dp-primary)" }} />
                           </div>
                         ) : signingStatus ? (
                           <div className="space-y-3">
-                            <div className="flex items-center justify-between rounded-xl px-3 py-2.5" style={{ backgroundColor: "#F9FAFB", border: "1px solid #F3F4F6" }}>
+                            <div className="flex items-center justify-between rounded-xl px-3 py-2.5" style={{ backgroundColor: "var(--dp-info-bg)", border: "1px solid var(--dp-divider)" }}>
                               <div>
-                                <p className="text-xs font-semibold uppercase" style={{ color: "#9CA3AF" }}>Envelope Status</p>
-                                <p className="mt-0.5 text-sm font-semibold capitalize" style={{ color: "#111827" }}>{signingStatus.status.replaceAll("_", " ")}</p>
+                                <p className="text-xs font-semibold uppercase" style={{ color: "var(--dp-text-4)" }}>Envelope Status</p>
+                                <p className="mt-0.5 text-sm font-semibold capitalize" style={{ color: "var(--dp-text-1)" }}>{signingStatus.status.replaceAll("_", " ")}</p>
                               </div>
                               <span className="rounded-full px-2.5 py-1 text-xs font-semibold" style={{
-                                backgroundColor: signingStatus.status === "completed" ? "#F0FDF4" : signingStatus.status === "declined" ? "#FEF2F2" : signingStatus.status === "voided" ? "#F3F4F6" : "#FFFBEB",
-                                color: signingStatus.status === "completed" ? "#16A34A" : signingStatus.status === "declined" ? "#DC2626" : signingStatus.status === "voided" ? "#6B7280" : "#D97706",
+                                backgroundColor: signingStatus.status === "completed" ? "#F0FDF4" : signingStatus.status === "declined" ? "#FEF2F2" : signingStatus.status === "voided" ? "var(--dp-info-bg)" : "#FFFBEB",
+                                color: signingStatus.status === "completed" ? "#16A34A" : signingStatus.status === "declined" ? "#DC2626" : signingStatus.status === "voided" ? "var(--dp-text-3)" : "#D97706",
                               }}>{signingStatus.status}</span>
                             </div>
                             {signingStatus.signers.length > 0 && (
                               <div className="space-y-2">
-                                <p className="text-xs font-semibold uppercase" style={{ color: "#9CA3AF" }}>Signers</p>
+                                <p className="text-xs font-semibold uppercase" style={{ color: "var(--dp-text-4)" }}>Signers</p>
                                 {signingStatus.signers.map((signer, i) => (
-                                  <div key={i} className="flex items-center gap-2 rounded-xl px-3 py-2" style={{ backgroundColor: "#FAFAFA", border: "1px solid #F3F4F6" }}>
-                                    <Mail className="h-3.5 w-3.5 shrink-0" style={{ color: "#9CA3AF" }} />
+                                  <div key={i} className="flex items-center gap-2 rounded-xl px-3 py-2" style={{ backgroundColor: "var(--dp-info-bg)", border: "1px solid var(--dp-divider)" }}>
+                                    <Mail className="h-3.5 w-3.5 shrink-0" style={{ color: "var(--dp-text-4)" }} />
                                     <div className="min-w-0 flex-1">
-                                      <p className="truncate text-xs font-semibold" style={{ color: "#111827" }}>{signer.name}</p>
-                                      <p className="truncate text-xs" style={{ color: "#6B7280" }}>{signer.email}</p>
+                                      <p className="truncate text-xs font-semibold" style={{ color: "var(--dp-text-1)" }}>{signer.name}</p>
+                                      <p className="truncate text-xs" style={{ color: "var(--dp-text-3)" }}>{signer.email}</p>
                                     </div>
                                     <span className="shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold capitalize" style={{ backgroundColor: signer.status === "completed" ? "#F0FDF4" : "#FFFBEB", color: signer.status === "completed" ? "#16A34A" : "#D97706" }}>{signer.status}</span>
                                   </div>
@@ -1336,7 +1338,7 @@ export default function DocumentsPage() {
                             </div>
                           </div>
                         ) : selectedChain.document.file_url ? (
-                          <button type="button" onClick={() => { setShowSignModal(true); setSignError(""); }} className="flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold transition-all hover:opacity-90" style={{ backgroundColor: "#3338A0", color: "#fff" }}>
+                          <button type="button" onClick={() => { setShowSignModal(true); setSignError(""); }} className="flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold transition-all hover:opacity-90" style={{ backgroundColor: "var(--dp-primary)", color: "#fff" }}>
                             <PenLine className="h-4 w-4" /> Send for Signing
                           </button>
                         ) : (
@@ -1361,11 +1363,11 @@ export default function DocumentsPage() {
       {showSignModal && (
         <div
           className="fixed inset-0 z-[60] flex items-center justify-center p-4"
-          style={{ backgroundColor: "rgba(0,0,0,0.55)", backdropFilter: "blur(4px)" }}
+          style={{ backgroundColor: "var(--dp-backdrop)", backdropFilter: "blur(4px)" }}
           onClick={(e) => { if (e.target === e.currentTarget) setShowSignModal(false); }}
         >
-          <div className="w-full max-w-md rounded-2xl overflow-hidden shadow-2xl" style={{ backgroundColor: "#fff", animation: "modalIn 0.2s cubic-bezier(0.34,1.56,0.64,1)" }}>
-            <div className="flex items-center justify-between px-6 py-5" style={{ background: "linear-gradient(135deg,#3338A0 0%,#4F54C4 100%)" }}>
+          <div className="w-full max-w-md rounded-2xl overflow-hidden shadow-2xl" style={{ backgroundColor: "var(--dp-card-bg)", animation: "modalIn 0.2s cubic-bezier(0.34,1.56,0.64,1)" }}>
+            <div className="flex items-center justify-between px-6 py-5" style={{ background: "linear-gradient(135deg,var(--dp-primary) 0%,var(--dp-primary-lt) 100%)" }}>
               <div className="flex items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl" style={{ backgroundColor: "rgba(255,255,255,0.15)" }}>
                   <PenLine className="h-4 w-4 text-white" />
@@ -1381,14 +1383,14 @@ export default function DocumentsPage() {
             </div>
 
             <form onSubmit={handleSendForSigning} className="p-6 space-y-4">
-              <p className="text-xs" style={{ color: "#6B7280" }}>Add signers who will receive an email invitation from DocuSign.</p>
+              <p className="text-xs" style={{ color: "var(--dp-text-3)" }}>Add signers who will receive an email invitation from DocuSign.</p>
               <div className="space-y-3">
                 {signers.map((signer, index) => (
-                  <div key={index} className="rounded-xl p-3 space-y-2" style={{ backgroundColor: "#F9FAFB", border: "1px solid #F3F4F6" }}>
+                  <div key={index} className="rounded-xl p-3 space-y-2" style={{ backgroundColor: "var(--dp-info-bg)", border: "1px solid var(--dp-divider)" }}>
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold" style={{ color: "#374151" }}>Signer {index + 1}</span>
+                      <span className="text-xs font-semibold" style={{ color: "var(--dp-text-2)" }}>Signer {index + 1}</span>
                       {signers.length > 1 && (
-                        <button type="button" onClick={() => setSigners(signers.filter((_, i) => i !== index))} className="rounded-lg p-1 hover:bg-gray-100" style={{ color: "#9CA3AF" }}>
+                        <button type="button" onClick={() => setSigners(signers.filter((_, i) => i !== index))} className="rounded-lg p-1 hover:bg-gray-100" style={{ color: "var(--dp-text-4)" }}>
                           <X className="h-3.5 w-3.5" />
                         </button>
                       )}
@@ -1398,13 +1400,13 @@ export default function DocumentsPage() {
                   </div>
                 ))}
               </div>
-              <button type="button" onClick={() => setSigners([...signers, { name: "", email: "" }])} className="flex items-center gap-1.5 text-xs font-semibold" style={{ color: "#3338A0" }}>
+              <button type="button" onClick={() => setSigners([...signers, { name: "", email: "" }])} className="flex items-center gap-1.5 text-xs font-semibold" style={{ color: "var(--dp-primary)" }}>
                 <Plus className="h-3.5 w-3.5" /> Add another signer
               </button>
               {signError && <p className="rounded-xl px-3 py-2 text-xs font-medium" style={{ backgroundColor: "#FEF2F2", color: "#DC2626" }}>{signError}</p>}
               <div className="flex gap-2 pt-1">
-                <button type="button" onClick={() => setShowSignModal(false)} className="flex-1 rounded-xl border py-2.5 text-sm font-semibold transition-colors hover:bg-gray-50" style={{ borderColor: "#E5E7EB", color: "#6B7280" }}>Cancel</button>
-                <button type="submit" disabled={signSubmitting} className="flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold transition-all hover:opacity-90 disabled:opacity-60" style={{ backgroundColor: "#3338A0", color: "#fff" }}>
+                <button type="button" onClick={() => setShowSignModal(false)} className="flex-1 rounded-xl border py-2.5 text-sm font-semibold transition-colors hover:bg-gray-50" style={{ borderColor: "var(--dp-card-border)", color: "var(--dp-text-3)" }}>Cancel</button>
+                <button type="submit" disabled={signSubmitting} className="flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold transition-all hover:opacity-90 disabled:opacity-60" style={{ backgroundColor: "var(--dp-primary)", color: "#fff" }}>
                   {signSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <PenLine className="h-4 w-4" />}
                   {signSubmitting ? "Sending…" : "Send via DocuSign"}
                 </button>

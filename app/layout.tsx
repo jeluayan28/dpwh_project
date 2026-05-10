@@ -26,7 +26,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
+      <head>
+        {/* Apply saved theme before first paint — prevents flash */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('dpwh_theme')||'light';var d=t==='dark'||(t==='system'&&window.matchMedia('(prefers-color-scheme:dark)').matches);if(d)document.documentElement.classList.add('dark');}catch(e){}})();`,
+          }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} min-h-screen antialiased bg-background text-foreground`}
       >

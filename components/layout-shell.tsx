@@ -31,6 +31,20 @@ export function LayoutShell({ children }: LayoutShellProps) {
   const { user, isAdmin } = useSession();
   const userEmail = user?.email ?? null;
   const userInitial = (user?.email?.[0] ?? user?.name?.[0] ?? "U").toUpperCase();
+  const [avatarSrc, setAvatarSrc] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+    const stored = localStorage.getItem(`dpwh_avatar_${user.user_id}`);
+    setAvatarSrc(stored ?? null);
+
+    /* listen for storage changes from the settings page */
+    function onStorage(e: StorageEvent) {
+      if (e.key === `dpwh_avatar_${user!.user_id}`) setAvatarSrc(e.newValue);
+    }
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, [user]);
 
   function handleLogout() {
     setUserMenuOpen(false);
@@ -131,33 +145,33 @@ export function LayoutShell({ children }: LayoutShellProps) {
               <div
                 className="absolute rounded-lg overflow-hidden shadow-xl z-50"
                 style={{
-                  backgroundColor: "#fff",
-                  border: "1px solid #E5E7EB",
+                  backgroundColor: "var(--dp-card-bg)",
+                  border: "1px solid var(--dp-card-border)",
                   ...(sidebarOpen
                     ? { bottom: "100%", left: "0.75rem", right: "0.75rem", marginBottom: "0.5rem" }
                     : { bottom: "0", left: "calc(100% + 8px)", width: "200px" }),
                 }}
               >
                 {/* User info header */}
-                <div className="px-3 py-2.5 border-b" style={{ borderColor: "#F3F4F6" }}>
-                  <p className="text-xs font-semibold truncate" style={{ color: "#111827" }}>
+                <div className="px-3 py-2.5 border-b" style={{ borderColor: "var(--dp-divider)" }}>
+                  <p className="text-xs font-semibold truncate" style={{ color: "var(--dp-text-1)" }}>
                     {userEmail ?? "—"}
                   </p>
-                  <p className="text-xs truncate" style={{ color: "#9CA3AF" }}>Signed in</p>
+                  <p className="text-xs truncate" style={{ color: "var(--dp-text-4)" }}>Signed in</p>
                 </div>
                 <div className="py-1">
                   <Link
                     href="/user/user-account"
                     onClick={() => setUserMenuOpen(false)}
-                    className="flex items-center gap-2.5 px-3 py-2 text-sm transition-colors hover:bg-gray-50"
-                    style={{ color: "#374151" }}
+                    className="flex items-center gap-2.5 px-3 py-2 text-sm transition-colors hover:bg-gray-50 dark:hover:bg-white/5"
+                    style={{ color: "var(--dp-text-2)" }}
                   >
-                    <Settings className="h-4 w-4" style={{ color: "#6B7280" }} />
+                    <Settings className="h-4 w-4" style={{ color: "var(--dp-text-3)" }} />
                     Account Settings
                   </Link>
                   <button
                     onClick={handleLogout}
-                    className="flex w-full items-center gap-2.5 px-3 py-2 text-sm transition-colors hover:bg-gray-50"
+                    className="flex w-full items-center gap-2.5 px-3 py-2 text-sm transition-colors hover:bg-gray-50 dark:hover:bg-white/5"
                     style={{ color: "#DC2626" }}
                   >
                     <LogOut className="h-4 w-4" />
@@ -174,10 +188,12 @@ export function LayoutShell({ children }: LayoutShellProps) {
                 className="flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 transition-colors hover:bg-white/10"
               >
                 <div
-                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
+                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white overflow-hidden"
                   style={{ backgroundColor: "rgba(255,255,255,0.2)" }}
                 >
-                  {userInitial}
+                  {avatarSrc
+                    ? <img src={avatarSrc} alt="avatar" className="h-full w-full object-cover" />
+                    : userInitial}
                 </div>
                 <div className="flex-1 min-w-0 text-left">
                   <p className="text-xs whitespace-nowrap" style={{ color: "rgba(255,255,255,0.55)" }}>Logged in as</p>
@@ -193,11 +209,13 @@ export function LayoutShell({ children }: LayoutShellProps) {
             ) : (
               <button
                 onClick={() => setUserMenuOpen((o) => !o)}
-                className="mx-auto flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold text-white transition-colors hover:bg-white/30"
+                className="mx-auto flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold text-white transition-colors hover:bg-white/30 overflow-hidden"
                 style={{ backgroundColor: "rgba(255,255,255,0.2)" }}
                 title={userEmail ?? undefined}
               >
-                {userInitial}
+                {avatarSrc
+                  ? <img src={avatarSrc} alt="avatar" className="h-full w-full object-cover" />
+                  : userInitial}
               </button>
             )}
           </div>
