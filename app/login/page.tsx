@@ -34,7 +34,7 @@ function LoginForm({
     // Look up the user in the Users table by email, join their role
     const { data: users, error: dbError } = await supabase
       .from("Users")
-      .select("user_id, name, email, password, status, role_id, Roles(role_name)")
+      .select("user_id, name, email, password, status, role_id, department_id, Roles(role_name)")
       .ilike("email", email)
       .limit(1);
 
@@ -70,6 +70,7 @@ function LoginForm({
       name: user.name,
       email: user.email,
       role: roleName,
+      department_id: user.department_id,
     });
     localStorage.setItem("dpwh_session", sessionData);
     document.cookie = `dpwh_session=${encodeURIComponent(sessionData)}; path=/; SameSite=Lax`;

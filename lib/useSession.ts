@@ -7,6 +7,7 @@ export type SessionUser = {
   name: string;
   email: string;
   role: "Admin" | "Staff" | string;
+  department_id?: number | null;
 };
 
 export function useSession() {

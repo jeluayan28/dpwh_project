@@ -20,6 +20,7 @@ const LOGS_TABLE = "Document_Logs";
 const STATUS_HISTORY_TABLE = "Document_Status_History";
 const DEPARTMENTS_TABLE = "Departments";
 const USERS_TABLE = "Users";
+const SIGNATURES_BUCKET = "signatures";
 
 class DocumentTrackingError extends Error {
   status: number;
@@ -213,7 +214,34 @@ export async function listDocuments() {
     throw new DocumentTrackingError(error.message, 500);
   }
 
-  return (data ?? []) as DocumentRecord[];
+  const documents = (data ?? []) as DocumentRecord[];
+  if (documents.length === 0) return documents;
+
+  const documentIds = documents.map((document) => document.document_id);
+  const { data: logs, error: logsError } = await supabase
+    .from(LOGS_TABLE)
+    .select("*")
+    .in("document_id", documentIds)
+    .order("date_received", { ascending: true })
+    .order("log_id", { ascending: true });
+
+  if (logsError) {
+    throw new DocumentTrackingError(logsError.message, 500);
+  }
+
+  const latestLogByDocument = new Map<number, DocumentLogRecord>();
+  ((logs ?? []) as DocumentLogRecord[]).forEach((log) => {
+    latestLogByDocument.set(log.document_id, log);
+  });
+
+  return documents.map((document) => {
+    const latestLog = latestLogByDocument.get(document.document_id);
+    return {
+      ...document,
+      current_department_id: latestLog?.to_department_id ?? null,
+      current_assigned_user_id: latestLog?.received_by ?? null,
+    };
+  });
 }
 
 export async function getDocumentById(documentId: number) {
@@ -531,6 +559,112 @@ export async function createStatusHistoryEntry(
   }
 
   return data;
+}
+
+function parseSignatureDataUrl(value: unknown) {
+  if (typeof value !== "string") {
+    throw new DocumentTrackingError("signatureDataUrl is required.");
+  }
+
+  const match = value.match(/^data:image\/png;base64,([A-Za-z0-9+/=]+)$/);
+  if (!match) {
+    throw new DocumentTrackingError("signatureDataUrl must be a PNG data URL.");
+  }
+
+  return Buffer.from(match[1], "base64");
+}
+
+async function ensureSignaturesBucket() {
+  const supabase = createServerSupabaseClient();
+  const { data, error } = await supabase.storage.listBuckets();
+
+  if (error) {
+    throw new DocumentTrackingError(error.message, 500);
+  }
+
+  const exists = data?.some((bucket) => bucket.name === SIGNATURES_BUCKET);
+  if (exists) return;
+
+  const { error: createError } = await supabase.storage.createBucket(
+    SIGNATURES_BUCKET,
+    {
+      public: true,
+      allowedMimeTypes: ["image/png"],
+      fileSizeLimit: 1024 * 1024,
+    },
+  );
+
+  if (createError) {
+    throw new DocumentTrackingError(createError.message, 500);
+  }
+}
+
+export async function approveAssignedDocument(
+  documentId: number,
+  input: { user_id?: unknown; signatureDataUrl?: unknown; remarks?: unknown },
+) {
+  const userId = toOptionalNumber(input.user_id);
+  if (!userId) {
+    throw new DocumentTrackingError("user_id is required.");
+  }
+
+  const document = await getDocumentOrThrow(documentId);
+  const logs = await listLogs(documentId);
+  const latestLog = logs.at(-1);
+
+  if (!latestLog?.to_department_id) {
+    throw new DocumentTrackingError("Document is not assigned to a department.", 409);
+  }
+
+  if (latestLog.received_by !== userId) {
+    throw new DocumentTrackingError("Only the assigned receiver can sign and approve this document.", 403);
+  }
+
+  const signatureBuffer = parseSignatureDataUrl(input.signatureDataUrl);
+  const signaturePath = `${documentId}/${Date.now()}-${userId}.png`;
+  const supabase = createServerSupabaseClient();
+
+  await ensureSignaturesBucket();
+
+  const { error: uploadError } = await supabase.storage
+    .from(SIGNATURES_BUCKET)
+    .upload(signaturePath, signatureBuffer, {
+      contentType: "image/png",
+      upsert: false,
+    });
+
+  if (uploadError) {
+    throw new DocumentTrackingError(uploadError.message, 500);
+  }
+
+  const { data: publicUrlData } = supabase.storage
+    .from(SIGNATURES_BUCKET)
+    .getPublicUrl(signaturePath);
+
+  const signatureUrl = publicUrlData.publicUrl;
+  const signedAt = new Date().toISOString();
+  const remarks =
+    typeof input.remarks === "string" && input.remarks.trim()
+      ? input.remarks.trim()
+      : "Signed and approved by assigned receiver.";
+
+  await createLog(documentId, {
+    from_department_id: latestLog.to_department_id,
+    to_department_id: latestLog.to_department_id,
+    released_by: userId,
+    received_by: userId,
+    date_received: signedAt,
+    date_released: signedAt,
+    remarks: `${remarks} Signature: ${signatureUrl}`,
+    status: "approved",
+  });
+
+  return {
+    document_id: document.document_id,
+    status: "approved",
+    signature_url: signatureUrl,
+    signed_at: signedAt,
+  };
 }
 
 export async function updateStatusHistoryEntry(

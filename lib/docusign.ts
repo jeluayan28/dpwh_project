@@ -22,7 +22,24 @@ let _cachedToken: string | null = null;
 let _tokenExpiresAt = 0;
 const TOKEN_BUFFER = 60;
 
+function assertDocuSignConfigured() {
+  const missing = [
+    ["DOCUSIGN_INTEGRATION_KEY", DS_INTEGRATION_KEY],
+    ["DOCUSIGN_USER_ID", DS_USER_ID],
+    ["DOCUSIGN_ACCOUNT_ID", DS_ACCOUNT_ID],
+    ["DOCUSIGN_PRIVATE_KEY", DS_PRIVATE_KEY],
+  ]
+    .filter(([, value]) => !value)
+    .map(([key]) => key);
+
+  if (missing.length > 0) {
+    throw new Error(`DocuSign is not configured. Missing: ${missing.join(", ")}`);
+  }
+}
+
 export async function getDocuSignToken(): Promise<string> {
+  assertDocuSignConfigured();
+
   if (_cachedToken && Date.now() / 1000 < _tokenExpiresAt - TOKEN_BUFFER) {
     return _cachedToken;
   }

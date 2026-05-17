@@ -22,12 +22,14 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { useSession } from "@/lib/useSession";
 
 const statusConfig: Record<
   string,
   { label: string; color: string; bg: string; dot: string }
 > = {
   completed: { label: "Completed", color: "#15803D", bg: "#F0FDF4", dot: "#22C55E" },
+  approved:  { label: "Approved",  color: "#15803D", bg: "#F0FDF4", dot: "#22C55E" },
   pending:   { label: "Pending",   color: "#92400E", bg: "#FFFBEB", dot: "#F59E0B" },
   overdue:   { label: "Overdue",   color: "#991B1B", bg: "#FEF2F2", dot: "#EF4444" },
   in_transit:{ label: "In Transit",color: "#1E40AF", bg: "#EFF6FF", dot: "#3B82F6" },
@@ -42,6 +44,8 @@ type Document = {
   created_at: string;
   type: string;
   file_url?: string | null;
+  current_department_id?: number | null;
+  current_assigned_user_id?: number | null;
 };
 
 type Department = {
@@ -129,7 +133,7 @@ type SigningStatus = {
   signers: { name: string; email: string; status: string; signedDateTime?: string }[];
 } | null;
 
-const STATUS_FILTERS = ["All", "Completed", "Pending", "Overdue", "In Transit"];
+const STATUS_FILTERS = ["All", "Approved", "Completed", "Pending", "Overdue", "In Transit"];
 const DOCUMENT_TYPES = [
   "Payroll",
   "Memo",
@@ -138,7 +142,7 @@ const DOCUMENT_TYPES = [
   "Request",
   "Other",
 ];
-const DOCUMENT_STATUSES = ["pending", "in_transit", "completed", "overdue"];
+const DOCUMENT_STATUSES = ["pending", "in_transit", "approved", "completed", "overdue"];
 
 const EMPTY_FORM: FormData = {
   title: "",
@@ -340,13 +344,146 @@ function getTrackerSteps(chain: ChainOfCustody | null): TrackerStep[] {
   }));
 }
 
+function SignaturePad({
+  disabled,
+  onApprove,
+}: {
+  disabled: boolean;
+  onApprove: (signatureDataUrl: string, remarks: string) => Promise<void>;
+}) {
+  const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
+  const [drawing, setDrawing] = useState(false);
+  const [hasInk, setHasInk] = useState(false);
+  const [remarks, setRemarks] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const resize = () => {
+      const parentWidth = canvas.parentElement?.clientWidth ?? 520;
+      const width = Math.min(parentWidth, 560);
+      const height = 180;
+      const ratio = window.devicePixelRatio || 1;
+      canvas.width = width * ratio;
+      canvas.height = height * ratio;
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      ctx.lineWidth = 2;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.strokeStyle = "#111827";
+    };
+
+    resize();
+    window.addEventListener("resize", resize);
+    return () => window.removeEventListener("resize", resize);
+  }, []);
+
+  function getPoint(event: React.PointerEvent<HTMLCanvasElement>) {
+    const canvas = canvasRef.current!;
+    const rect = canvas.getBoundingClientRect();
+    return { x: event.clientX - rect.left, y: event.clientY - rect.top };
+  }
+
+  function start(event: React.PointerEvent<HTMLCanvasElement>) {
+    if (disabled || saving) return;
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext("2d");
+    if (!canvas || !ctx) return;
+    const point = getPoint(event);
+    ctx.beginPath();
+    ctx.moveTo(point.x, point.y);
+    canvas.setPointerCapture(event.pointerId);
+    setDrawing(true);
+  }
+
+  function move(event: React.PointerEvent<HTMLCanvasElement>) {
+    if (!drawing || disabled || saving) return;
+    const ctx = canvasRef.current?.getContext("2d");
+    if (!ctx) return;
+    const point = getPoint(event);
+    ctx.lineTo(point.x, point.y);
+    ctx.stroke();
+    setHasInk(true);
+  }
+
+  function clear() {
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext("2d");
+    if (!canvas || !ctx) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    setHasInk(false);
+  }
+
+  async function save() {
+    const canvas = canvasRef.current;
+    if (!canvas || !hasInk) return;
+    setSaving(true);
+    setError("");
+    try {
+      await onApprove(canvas.toDataURL("image/png"), remarks);
+      clear();
+      setRemarks("");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to save signature.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="space-y-3">
+      <canvas
+        ref={canvasRef}
+        className="block max-w-full rounded-xl border bg-white"
+        style={{ borderColor: "var(--dp-card-border)", touchAction: "none", opacity: disabled ? 0.55 : 1 }}
+        onPointerDown={start}
+        onPointerMove={move}
+        onPointerUp={() => setDrawing(false)}
+        onPointerLeave={() => setDrawing(false)}
+      />
+      <textarea
+        rows={2}
+        value={remarks}
+        onChange={(e) => setRemarks(e.target.value)}
+        placeholder="Approval remarks..."
+        disabled={disabled || saving}
+        className="w-full resize-none rounded-xl border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-200"
+        style={{ borderColor: "var(--dp-card-border)", backgroundColor: "var(--dp-card-bg)", color: "var(--dp-text-1)" }}
+      />
+      <div className="flex gap-2">
+        <button type="button" onClick={clear} disabled={disabled || saving || !hasInk} className="flex-1 rounded-xl border py-2.5 text-sm font-semibold disabled:opacity-50" style={{ borderColor: "var(--dp-card-border)", color: "var(--dp-text-3)" }}>
+          Clear
+        </button>
+        <button type="button" onClick={save} disabled={disabled || saving || !hasInk} className="flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold disabled:opacity-60" style={{ backgroundColor: "var(--dp-primary)", color: "#fff" }}>
+          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <PenLine className="h-4 w-4" />}
+          {saving ? "Saving..." : "Sign & Approve"}
+        </button>
+      </div>
+      {error && (
+        <p className="rounded-xl px-3 py-2 text-xs font-medium" style={{ backgroundColor: "#FEF2F2", color: "#DC2626" }}>
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+
 export default function DocumentsPage() {
+  const { user } = useSession();
   const [documents, setDocuments] = useState<Document[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [users, setUsers] = useState<UserOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
+  const [queueFilter, setQueueFilter] = useState<"all" | "department" | "assigned">("all");
   const [showModal, setShowModal] = useState(false);
   const [selectedDocumentId, setSelectedDocumentId] = useState<number | null>(null);
   const [detailsLoading, setDetailsLoading] = useState(false);
@@ -756,6 +893,30 @@ export default function DocumentsPage() {
     }
   }
 
+  async function handleAssignedApproval(signatureDataUrl: string, remarks: string) {
+    if (!selectedDocumentId || !user) return;
+    setDetailsError("");
+
+    const response = await fetch(`/api/documents/${selectedDocumentId}/approve`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        user_id: user.user_id,
+        signatureDataUrl,
+        remarks,
+      }),
+    });
+    const result = (await response.json()) as { error?: string };
+    if (!response.ok) {
+      throw new Error(result.error ?? "Unable to approve document.");
+    }
+
+    await Promise.all([
+      fetchDocuments(),
+      fetchDocumentDetails(selectedDocumentId),
+    ]);
+  }
+
   useEffect(() => {
     fetchDocuments();
     fetchReferenceData();
@@ -772,10 +933,22 @@ export default function DocumentsPage() {
       statusFilter === "All" ||
       doc.status?.toLowerCase() === statusFilter.toLowerCase().replace(" ", "_");
 
-    return matchesSearch && matchesStatus;
+    const matchesQueue =
+      queueFilter === "all" ||
+      (queueFilter === "department" &&
+        user?.department_id != null &&
+        doc.current_department_id === user.department_id) ||
+      (queueFilter === "assigned" &&
+        user?.user_id != null &&
+        doc.current_assigned_user_id === user.user_id);
+
+    return matchesSearch && matchesStatus && matchesQueue;
   });
 
   const trackerSteps = getTrackerSteps(selectedChain);
+  const latestLog = selectedChain?.logs.at(-1);
+  const isAssignedToMe =
+    Boolean(user?.user_id) && latestLog?.received_by === user?.user_id;
 
   const closeDetails = () => {
     setSelectedDocumentId(null);
@@ -824,6 +997,20 @@ export default function DocumentsPage() {
         <div className="flex items-center gap-2">
           <Filter className="h-4 w-4 shrink-0" style={{ color: "var(--dp-text-4)" }} />
           <div className="flex flex-wrap gap-1.5">
+            {[
+              { id: "all", label: "All Papers" },
+              { id: "department", label: "My Department" },
+              { id: "assigned", label: "Assigned to Me" },
+            ].map((item) => (
+              <button
+                key={item.id}
+                onClick={() => setQueueFilter(item.id as "all" | "department" | "assigned")}
+                className="rounded-full px-3 py-1 text-xs font-semibold transition-all"
+                style={{ backgroundColor: queueFilter === item.id ? "var(--dp-primary)" : "var(--dp-info-bg)", color: queueFilter === item.id ? "#fff" : "var(--dp-text-3)" }}
+              >
+                {item.label}
+              </button>
+            ))}
             {STATUS_FILTERS.map((s) => (
               <button
                 key={s}
@@ -1286,7 +1473,22 @@ export default function DocumentsPage() {
 
                     {/* ── Tab: E-Signature ── */}
                     {detailTab === "esign" && (
-                      <div className="max-w-md">
+                      <div className="grid gap-6 lg:grid-cols-2">
+                        <div className="rounded-2xl p-5" style={{ backgroundColor: "var(--dp-info-bg)", border: "1px solid var(--dp-divider)" }}>
+                          <div className="mb-3">
+                            <h3 className="text-sm font-semibold" style={{ color: "var(--dp-text-1)" }}>Sign & Approve</h3>
+                            <p className="text-xs" style={{ color: "var(--dp-text-4)" }}>Only the current assigned receiver can sign this document.</p>
+                          </div>
+                          {isAssignedToMe ? (
+                            <SignaturePad disabled={false} onApprove={handleAssignedApproval} />
+                          ) : (
+                            <p className="rounded-xl px-3 py-3 text-xs" style={{ backgroundColor: "#FFFBEB", color: "#D97706", border: "1px solid #FDE68A" }}>
+                              Assigned to {latestLog?.received_by_name ?? "another receiver"}. The signature pad appears when it is assigned to you.
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="max-w-md">
                         <div className="mb-3">
                           <h3 className="text-sm font-semibold" style={{ color: "var(--dp-text-1)" }}>E-Signature (DocuSign)</h3>
                           <p className="text-xs" style={{ color: "var(--dp-text-4)" }}>Send this document for electronic signing</p>
@@ -1346,6 +1548,7 @@ export default function DocumentsPage() {
                             Attach a file to this document before sending for signing.
                           </p>
                         )}
+                      </div>
                       </div>
                     )}
 

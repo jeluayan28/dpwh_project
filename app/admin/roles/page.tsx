@@ -424,6 +424,52 @@ function DeleteConfirmModal({ name, onClose, onConfirm, deleting }: {
 }
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
+function DepartmentMembersModal({
+  dept,
+  users,
+  onClose,
+}: {
+  dept: DeptRow;
+  users: UserRow[];
+  onClose: () => void;
+}) {
+  const members = users.filter((user) => user.department_id === dept.department_id);
+
+  return (
+    <Modal title="Department Members" subtitle={dept.department_name} icon={<Users className="h-4 w-4 text-white" />} onClose={onClose}>
+      <div className="px-6 py-5">
+        <div className="mb-4 rounded-xl px-3 py-2" style={{ backgroundColor: "var(--dp-info-bg)", border: "1px solid var(--dp-divider)" }}>
+          <p className="text-xs font-semibold uppercase" style={{ color: "var(--dp-text-4)" }}>Total Members</p>
+          <p className="text-lg font-bold" style={{ color: "var(--dp-text-1)" }}>{members.length}</p>
+        </div>
+        {members.length === 0 ? (
+          <div className="flex flex-col items-center justify-center gap-2 rounded-xl py-10" style={{ backgroundColor: "var(--dp-info-bg)" }}>
+            <Users className="h-6 w-6" style={{ color: "var(--dp-text-4)" }} />
+            <p className="text-sm" style={{ color: "var(--dp-text-4)" }}>No members in this department yet.</p>
+          </div>
+        ) : (
+          <div className="max-h-80 space-y-2 overflow-y-auto pr-1">
+            {members.map((member) => (
+              <div key={member.user_id} className="flex items-center gap-3 rounded-xl px-3 py-2.5" style={{ backgroundColor: "var(--dp-info-bg)", border: "1px solid var(--dp-divider)" }}>
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white" style={{ backgroundColor: getColor(member.user_id) }}>
+                  {getInitials(member.name)}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold" style={{ color: "var(--dp-text-1)" }}>{member.name}</p>
+                  <p className="truncate text-xs" style={{ color: "var(--dp-text-4)" }}>{member.email}</p>
+                </div>
+                <span className="rounded-full px-2 py-0.5 text-xs font-semibold" style={{ backgroundColor: member.status ? "#F0FDF4" : "var(--dp-info-bg)", color: member.status ? "#15803D" : "var(--dp-text-4)" }}>
+                  {member.status ? "Active" : "Inactive"}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </Modal>
+  );
+}
+
 export default function RolesPage() {
   const [activeTab, setActiveTab] = useState("users");
   const [openMenu, setOpenMenu] = useState<number | null>(null);
@@ -440,6 +486,7 @@ export default function RolesPage() {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [editingDept, setEditingDept] = useState<DeptRow | null>(null);
   const [deletingDept, setDeletingDept] = useState<DeptRow | null>(null);
+  const [viewingDeptMembers, setViewingDeptMembers] = useState<DeptRow | null>(null);
   const [deleteDeptLoading, setDeleteDeptLoading] = useState(false);
 
   function mergeDepartmentCounts(
@@ -596,6 +643,13 @@ export default function RolesPage() {
       {deletingDept && (
         <DeleteConfirmModal name={deletingDept.department_name} deleting={deleteDeptLoading}
           onClose={() => setDeletingDept(null)} onConfirm={handleDeleteDept} />
+      )}
+      {viewingDeptMembers && (
+        <DepartmentMembersModal
+          dept={viewingDeptMembers}
+          users={users}
+          onClose={() => setViewingDeptMembers(null)}
+        />
       )}
 
       {/* Page Header */}
@@ -754,10 +808,11 @@ export default function RolesPage() {
           {/* Column headers */}
           <div
             className="grid px-6 py-3 text-xs font-semibold uppercase tracking-wider"
-            style={{ gridTemplateColumns: "2fr 3fr 0.8fr 60px", backgroundColor: "var(--dp-info-bg)", color: "var(--dp-text-4)", borderBottom: "1px solid var(--dp-divider)" }}
+            style={{ gridTemplateColumns: "1.5fr 2fr 1.5fr 0.8fr 60px", backgroundColor: "var(--dp-info-bg)", color: "var(--dp-text-4)", borderBottom: "1px solid var(--dp-divider)" }}
           >
             <span>Department</span>
             <span>Description</span>
+            <span>Members List</span>
             <span className="text-right">Members</span>
             <span className="text-right">Action</span>
           </div>
@@ -778,7 +833,7 @@ export default function RolesPage() {
               <div
                 key={dept.department_id}
                 className="grid items-center px-6 py-3.5 transition-colors"
-                style={{ gridTemplateColumns: "2fr 3fr 0.8fr 60px", borderBottom: i < departments.length - 1 ? "1px solid var(--dp-divider)" : "none" }}
+                style={{ gridTemplateColumns: "1.5fr 2fr 1.5fr 0.8fr 60px", borderBottom: i < departments.length - 1 ? "1px solid var(--dp-divider)" : "none" }}
                 onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "var(--dp-row-hover)")}
                 onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
               >
@@ -792,11 +847,20 @@ export default function RolesPage() {
 
                 <span className="truncate text-sm pr-4" style={{ color: "var(--dp-text-3)" }}>{dept.description ?? "—"}</span>
 
+                <p className="truncate text-xs pr-4" style={{ color: "var(--dp-text-4)" }}>
+                  {users.filter((user) => user.department_id === dept.department_id).map((user) => user.name).join(", ") || "No members yet"}
+                </p>
+
                 {/* Member count */}
                 <div className="flex justify-end">
-                  <span className="rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap" style={{ backgroundColor: "var(--dp-primary-bg)", color: "var(--dp-primary)" }}>
+                  <button
+                    type="button"
+                    onClick={() => setViewingDeptMembers(dept)}
+                    className="rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap transition-all hover:-translate-y-px hover:opacity-90"
+                    style={{ backgroundColor: "var(--dp-primary-bg)", color: "var(--dp-primary)" }}
+                  >
                     {dept.member_count} members
-                  </span>
+                  </button>
                 </div>
 
                 {/* Action menu */}
@@ -810,6 +874,13 @@ export default function RolesPage() {
                   </button>
                   {openMenu === dept.department_id + 1000 && (
                     <div className="absolute right-0 top-8 z-20 w-40 rounded-xl py-1 shadow-lg" style={{ backgroundColor: "var(--dp-card-bg)", border: "1px solid var(--dp-card-border)" }}>
+                      <button
+                        className="flex w-full items-center gap-2 px-3 py-2 text-xs font-medium transition-colors hover:bg-gray-50"
+                        style={{ color: "var(--dp-text-2)" }}
+                        onClick={() => { setViewingDeptMembers(dept); setOpenMenu(null); }}
+                      >
+                        <Users className="h-3.5 w-3.5" style={{ color: "var(--dp-primary)" }} /> View Members
+                      </button>
                       <button
                         className="flex w-full items-center gap-2 px-3 py-2 text-xs font-medium transition-colors hover:bg-gray-50"
                         style={{ color: "var(--dp-text-2)" }}

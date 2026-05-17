@@ -105,7 +105,8 @@ export async function POST(
   } catch (err: unknown) {
     console.error("DocuSign send error:", err);
     const message = err instanceof Error ? err.message : "DocuSign API error";
-    return NextResponse.json({ error: message }, { status: 502 });
+    const status = message.includes("DocuSign is not configured") ? 503 : 502;
+    return NextResponse.json({ error: message }, { status });
   }
 
   await supabase
