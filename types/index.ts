@@ -8,6 +8,11 @@ export type DocumentRecord = {
   type: string;
   created_by: number | null;
   file_url?: string | null;
+  current_department_id?: number | null;
+  current_department_name?: string | null;
+  current_assigned_user_id?: number | null;
+  stuck_since?: string | null;
+  days_stuck?: number;
 };
 
 export type DocumentLogRecord = {
@@ -93,6 +98,8 @@ export type ChainOfCustodyResponse = {
   document: DocumentRecord;
   current_department_id: number | null;
   current_department_name: string | null;
+  stuck_since?: string | null;
+  days_stuck?: number;
   latest_status: string;
   status_history: DocumentStatusHistoryRecord[];
   logs: ChainOfCustodyStep[];

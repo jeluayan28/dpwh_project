@@ -51,6 +51,20 @@ function getEventTimestamp(preferred?: string | null) {
   return preferred ?? new Date().toISOString();
 }
 
+function isFinalStatus(status: string | null | undefined) {
+  return status?.toLowerCase() === "completed";
+}
+
+function calculateDaysStuck(since: string | null | undefined, status: string) {
+  if (!since || isFinalStatus(status)) return 0;
+
+  const startedAt = new Date(since).getTime();
+  if (Number.isNaN(startedAt)) return 0;
+
+  const diff = Date.now() - startedAt;
+  return Math.max(0, Math.floor(diff / (1000 * 60 * 60 * 24)));
+}
+
 async function generateTrackingNumber() {
   const supabase = createServerSupabaseClient();
   const datePrefix = new Date().toISOString().slice(0, 10).replace(/-/g, "");
@@ -234,12 +248,26 @@ export async function listDocuments() {
     latestLogByDocument.set(log.document_id, log);
   });
 
+  const departmentMap = await getDepartmentNameMap(
+    [...latestLogByDocument.values()]
+      .map((log) => log.to_department_id)
+      .filter((value): value is number => value !== null),
+  );
+
   return documents.map((document) => {
     const latestLog = latestLogByDocument.get(document.document_id);
+    const stuckSince = latestLog?.date_received ?? latestLog?.date_released ?? document.created_at;
     return {
       ...document,
       current_department_id: latestLog?.to_department_id ?? null,
+      current_department_name: latestLog?.to_department_id
+        ? departmentMap.get(latestLog.to_department_id) ?? null
+        : null,
       current_assigned_user_id: latestLog?.received_by ?? null,
+      stuck_since: latestLog?.to_department_id ? stuckSince : null,
+      days_stuck: latestLog?.to_department_id
+        ? calculateDaysStuck(stuckSince, document.status)
+        : 0,
     };
   });
 }
@@ -656,12 +684,12 @@ export async function approveAssignedDocument(
     date_received: signedAt,
     date_released: signedAt,
     remarks: `${remarks} Signature: ${signatureUrl}`,
-    status: "approved",
+    status: "completed",
   });
 
   return {
     document_id: document.document_id,
-    status: "approved",
+    status: "completed",
     signature_url: signatureUrl,
     signed_at: signedAt,
   };
@@ -774,6 +802,7 @@ export async function getChainOfCustody(
 
   const latestLog = logs.at(-1);
   const latestStatus = statusHistory.at(-1)?.status ?? document.status;
+  const stuckSince = latestLog?.date_received ?? latestLog?.date_released ?? document.created_at;
 
   return {
     document,
@@ -781,6 +810,10 @@ export async function getChainOfCustody(
     current_department_name: latestLog?.to_department_id
       ? departmentMap.get(latestLog.to_department_id) ?? null
       : null,
+    stuck_since: latestLog?.to_department_id ? stuckSince : null,
+    days_stuck: latestLog?.to_department_id
+      ? calculateDaysStuck(stuckSince, latestStatus)
+      : 0,
     latest_status: latestStatus,
     status_history: statusHistory,
     logs: mappedLogs,

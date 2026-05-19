@@ -29,7 +29,6 @@ const statusConfig: Record<
   { label: string; color: string; bg: string; dot: string }
 > = {
   completed: { label: "Completed", color: "#15803D", bg: "#F0FDF4", dot: "#22C55E" },
-  approved:  { label: "Approved",  color: "#15803D", bg: "#F0FDF4", dot: "#22C55E" },
   pending:   { label: "Pending",   color: "#92400E", bg: "#FFFBEB", dot: "#F59E0B" },
   overdue:   { label: "Overdue",   color: "#991B1B", bg: "#FEF2F2", dot: "#EF4444" },
   in_transit:{ label: "In Transit",color: "#1E40AF", bg: "#EFF6FF", dot: "#3B82F6" },
@@ -45,7 +44,10 @@ type Document = {
   type: string;
   file_url?: string | null;
   current_department_id?: number | null;
+  current_department_name?: string | null;
   current_assigned_user_id?: number | null;
+  stuck_since?: string | null;
+  days_stuck?: number;
 };
 
 type Department = {
@@ -95,6 +97,8 @@ type ChainOfCustody = {
   document: Document;
   current_department_id: number | null;
   current_department_name: string | null;
+  stuck_since?: string | null;
+  days_stuck?: number;
   latest_status: string;
   status_history: StatusHistory[];
   logs: ChainLog[];
@@ -133,7 +137,7 @@ type SigningStatus = {
   signers: { name: string; email: string; status: string; signedDateTime?: string }[];
 } | null;
 
-const STATUS_FILTERS = ["All", "Approved", "Completed", "Pending", "Overdue", "In Transit"];
+const STATUS_FILTERS = ["All", "Completed", "Pending", "Overdue", "In Transit"];
 const DOCUMENT_TYPES = [
   "Payroll",
   "Memo",
@@ -142,7 +146,7 @@ const DOCUMENT_TYPES = [
   "Request",
   "Other",
 ];
-const DOCUMENT_STATUSES = ["pending", "in_transit", "approved", "completed", "overdue"];
+const DOCUMENT_STATUSES = ["pending", "in_transit", "completed", "overdue"];
 
 const EMPTY_FORM: FormData = {
   title: "",
@@ -277,6 +281,24 @@ function formatDateTime(value: string | null | undefined) {
     hour: "numeric",
     minute: "2-digit",
   });
+}
+
+function formatDaysStuck(days: number | null | undefined) {
+  const safeDays = Math.max(0, days ?? 0);
+  if (safeDays === 0) return "Today";
+  if (safeDays === 1) return "1 day";
+  return `${safeDays} days`;
+}
+
+function getStuckStyle(days: number | null | undefined, status: string) {
+  if (status.toLowerCase() === "completed") {
+    return { bg: "var(--dp-info-bg)", color: "var(--dp-text-4)", border: "var(--dp-divider)" };
+  }
+
+  const safeDays = days ?? 0;
+  if (safeDays >= 5) return { bg: "#FEF2F2", color: "#DC2626", border: "#FECACA" };
+  if (safeDays >= 3) return { bg: "#FFFBEB", color: "#D97706", border: "#FDE68A" };
+  return { bg: "var(--dp-primary-bg)", color: "var(--dp-primary)", border: "var(--dp-primary-bd)" };
 }
 
 function getTrackerSteps(chain: ChainOfCustody | null): TrackerStep[] {
@@ -943,7 +965,21 @@ export default function DocumentsPage() {
         doc.current_assigned_user_id === user.user_id);
 
     return matchesSearch && matchesStatus && matchesQueue;
+  }).sort((a, b) => {
+    const aCompleted = a.status?.toLowerCase() === "completed";
+    const bCompleted = b.status?.toLowerCase() === "completed";
+    if (aCompleted !== bCompleted) return aCompleted ? 1 : -1;
+    return (b.days_stuck ?? 0) - (a.days_stuck ?? 0);
   });
+
+  const stuckForReview = documents.filter(
+    (doc) => doc.status?.toLowerCase() !== "completed" && (doc.days_stuck ?? 0) >= 3,
+  );
+  const longestStuck = documents.reduce<Document | null>((longest, doc) => {
+    if (doc.status?.toLowerCase() === "completed") return longest;
+    if (!longest) return doc;
+    return (doc.days_stuck ?? 0) > (longest.days_stuck ?? 0) ? doc : longest;
+  }, null);
 
   const trackerSteps = getTrackerSteps(selectedChain);
   const latestLog = selectedChain?.logs.at(-1);
@@ -982,6 +1018,29 @@ export default function DocumentsPage() {
       </div>
 
       {/* ── Search + filters ── */}
+      <div className="mb-5 grid gap-3 sm:grid-cols-2">
+        <div className="rounded-2xl border p-4" style={{ backgroundColor: "var(--dp-card-bg)", borderColor: "var(--dp-card-border)" }}>
+          <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--dp-text-4)" }}>Stuck 3+ Days</p>
+          <div className="mt-2 flex items-end justify-between gap-3">
+            <p className="text-3xl font-bold" style={{ color: stuckForReview.length > 0 ? "#DC2626" : "var(--dp-text-1)" }}>{stuckForReview.length}</p>
+            <p className="text-xs text-right" style={{ color: "var(--dp-text-4)" }}>Active documents needing review</p>
+          </div>
+        </div>
+        <div className="rounded-2xl border p-4" style={{ backgroundColor: "var(--dp-card-bg)", borderColor: "var(--dp-card-border)" }}>
+          <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--dp-text-4)" }}>Longest Stop</p>
+          {longestStuck ? (
+            <div className="mt-2 min-w-0">
+              <p className="truncate text-sm font-semibold" style={{ color: "var(--dp-text-1)" }}>{longestStuck.title}</p>
+              <p className="mt-0.5 text-xs" style={{ color: "var(--dp-text-4)" }}>
+                {formatDaysStuck(longestStuck.days_stuck)} in {longestStuck.current_department_name ?? "unassigned department"}
+              </p>
+            </div>
+          ) : (
+            <p className="mt-2 text-sm" style={{ color: "var(--dp-text-4)" }}>No active department stops.</p>
+          )}
+        </div>
+      </div>
+
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative w-full sm:max-w-sm">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" style={{ color: "var(--dp-text-4)" }} />
@@ -1043,10 +1102,12 @@ export default function DocumentsPage() {
         {/* Column headers */}
         <div
           className="grid px-6 py-3 text-xs font-semibold uppercase tracking-wider"
-          style={{ gridTemplateColumns: "1fr 2fr 1fr 1fr 1fr 1fr 80px", backgroundColor: "var(--dp-info-bg)", color: "var(--dp-text-4)", borderBottom: "1px solid var(--dp-divider)" }}
+          style={{ gridTemplateColumns: "1fr 2fr 1.3fr 0.9fr 0.8fr 0.8fr 1fr 1fr 80px", backgroundColor: "var(--dp-info-bg)", color: "var(--dp-text-4)", borderBottom: "1px solid var(--dp-divider)" }}
         >
           <span>Tracking #</span>
           <span>Title</span>
+          <span>Last Department</span>
+          <span>Stuck</span>
           <span>File</span>
           <span>Type</span>
           <span>Date</span>
@@ -1073,7 +1134,7 @@ export default function DocumentsPage() {
               <div
                 key={doc.document_id}
                 className="grid items-center px-6 py-3.5 transition-colors"
-                style={{ gridTemplateColumns: "1fr 2fr 1fr 1fr 1fr 1fr 80px", borderBottom: i < filtered.length - 1 ? "1px solid var(--dp-divider)" : "none" }}
+                style={{ gridTemplateColumns: "1fr 2fr 1.3fr 0.9fr 0.8fr 0.8fr 1fr 1fr 80px", borderBottom: i < filtered.length - 1 ? "1px solid var(--dp-divider)" : "none" }}
                 onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "var(--dp-row-hover)")}
                 onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
               >
@@ -1088,6 +1149,25 @@ export default function DocumentsPage() {
                 {/* Title */}
                 <div className="min-w-0 pr-4">
                   <p className="truncate text-sm font-medium" style={{ color: "var(--dp-text-1)" }}>{doc.title}</p>
+                  <p className="truncate text-xs" style={{ color: "var(--dp-text-4)" }}>{doc.type ?? "No type"}</p>
+                </div>
+
+                <div className="min-w-0 pr-3">
+                  <p className="truncate text-xs font-semibold" style={{ color: "var(--dp-text-2)" }}>{doc.current_department_name ?? "Not assigned"}</p>
+                  <p className="truncate text-[11px]" style={{ color: "var(--dp-text-4)" }}>
+                    {doc.stuck_since ? `Since ${new Date(doc.stuck_since).toLocaleDateString("en-PH", { month: "short", day: "numeric" })}` : "No movement yet"}
+                  </p>
+                </div>
+
+                <div>
+                  {(() => {
+                    const stuckStyle = getStuckStyle(doc.days_stuck, doc.status);
+                    return (
+                      <span className="inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold whitespace-nowrap" style={{ backgroundColor: stuckStyle.bg, color: stuckStyle.color, borderColor: stuckStyle.border }}>
+                        {doc.status?.toLowerCase() === "completed" ? "Done" : formatDaysStuck(doc.days_stuck)}
+                      </span>
+                    );
+                  })()}
                 </div>
 
                 {/* File */}
@@ -1270,10 +1350,11 @@ export default function DocumentsPage() {
               <div className="p-6 space-y-5">
 
                 {/* ── Info cards row ── */}
-                <div className="grid gap-3 sm:grid-cols-4">
+                <div className="grid gap-3 sm:grid-cols-5">
                   {[
                     { label: "Tracking #", value: `#${selectedChain.document.tracking_num}`, mono: true },
                     { label: "Department", value: selectedChain.current_department_name ?? "Not assigned" },
+                    { label: "Days Stuck", value: selectedChain.latest_status === "completed" ? "Done" : formatDaysStuck(selectedChain.days_stuck) },
                     { label: "Status", value: selectedChain.latest_status.replaceAll("_", " "), capitalize: true },
                     { label: "Attachment", value: null, fileUrl: selectedChain.document.file_url },
                   ].map(({ label, value, mono, capitalize, fileUrl }) => (
